@@ -1,0 +1,9 @@
+export { HeroSection } from './HeroSection';
+export { BestSellersSection } from './BestSellersSection';
+export { QuizTeaserSection } from './QuizTeaserSection';
+export { FragranceFamiliesSection } from './FragranceFamiliesSection';
+export { DiscoverySetsSection } from './DiscoverySetsSection';
+export { TrendingSection } from './TrendingSection';
+export { GiftsSection } from './GiftsSection';
+export { ReviewsSection } from './ReviewsSection';
+export { JournalSection } from './JournalSection';
