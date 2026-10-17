@@ -24,7 +24,7 @@ export function ProductNotesPyramid({ product }: ProductNotesPyramidProps) {
       <div className="space-y-4">
         {noteLayers.map(({ label, notes, color }) => (
           <div key={label}>
-            <p className="text-[10px] font-mono uppercase tracking-widest text-noir-500 mb-2">{label}</p>
+            <p className="text-[11px] uppercase tracking-wider text-noir-400 font-medium mb-2">{label}</p>
             <div className="flex flex-wrap gap-x-4 gap-y-1.5">
               {notes.map((note) => (
                 <span key={note} className="flex items-center gap-1.5 text-xs text-noir-300">

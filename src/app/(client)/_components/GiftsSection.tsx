@@ -27,46 +27,48 @@ const GIFT_OCCASIONS = [
 
 export function GiftsSection() {
   return (
-    <section className="container-lux">
-      <div className="text-center max-w-2xl mx-auto mb-12">
-        <span className="text-xs font-mono uppercase tracking-[0.2em] text-gold-400">
-          Unforgettable Gestures
-        </span>
-        <h2 className="font-serif text-3xl md:text-4xl font-semibold text-noir-50 mt-1">
-          Gifts of Distinction
-        </h2>
-        <p className="text-sm text-noir-400 mt-2">
-          Every order is housed in velvet-lined ebony packaging with custom gold foil wax seals.
-        </p>
-      </div>
+    <section className="w-full">
+      <div className="container-lux">
+        <div className="text-center max-w-2xl mx-auto mb-12">
+          <span className="text-xs uppercase tracking-[0.16em] text-gold-400 font-medium">
+            Gifting &amp; Sets
+          </span>
+          <h2 className="font-serif text-3xl md:text-4xl font-semibold text-noir-50 mt-1">
+            Luxury Fragrance Gifts
+          </h2>
+          <p className="text-sm text-noir-400 mt-2">
+            Every order arrives in our signature dark packaging, ready for gifting.
+          </p>
+        </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {GIFT_OCCASIONS.map((occasion) => (
-          <Link
-            key={occasion.title}
-            href="/catalog"
-            className="group relative aspect-[4/5] rounded-2xl overflow-hidden border border-noir-800 shadow-xl"
-          >
-            <Image
-              src={occasion.image}
-              alt={occasion.title}
-              fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-              className="object-cover transition-transform duration-700 group-hover:scale-105 filter brightness-75 contrast-110"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-noir-950 via-noir-950/40 to-transparent" />
-            <div className="absolute inset-x-5 bottom-5 z-10">
-              <h3 className="font-serif text-xl font-medium text-cream-50 group-hover:text-gold-300 transition-colors mb-1">
-                {occasion.title}
-              </h3>
-              <p className="text-xs text-noir-300 line-clamp-2 font-light">{occasion.desc}</p>
-              <div className="mt-3 flex items-center gap-1 text-[11px] font-mono text-gold-400 uppercase tracking-wider">
-                <span>Shop Gifts</span>
-                <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-6">
+          {GIFT_OCCASIONS.map((occasion) => (
+            <Link
+              key={occasion.title}
+              href="/catalog"
+              className="group relative aspect-[4/5] rounded-2xl overflow-hidden border border-noir-800 shadow-xl"
+            >
+              <Image
+                src={occasion.image}
+                alt={occasion.title}
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 25vw"
+                className="object-cover transition-transform duration-700 group-hover:scale-105 filter brightness-75 contrast-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-noir-950 via-noir-950/40 to-transparent" />
+              <div className="absolute inset-x-5 bottom-5 z-10">
+                <h3 className="font-serif text-xl font-medium text-cream-50 group-hover:text-gold-300 transition-colors mb-1">
+                  {occasion.title}
+                </h3>
+                <p className="text-xs text-noir-300 line-clamp-2 font-light">{occasion.desc}</p>
+                <div className="mt-3 flex items-center gap-1 text-[11px] text-gold-400 uppercase tracking-wider font-medium">
+                  <span>Explore Gifts</span>
+                  <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                </div>
               </div>
-            </div>
-          </Link>
-        ))}
+            </Link>
+          ))}
+        </div>
       </div>
     </section>
   );

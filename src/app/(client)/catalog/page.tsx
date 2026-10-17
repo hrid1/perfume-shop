@@ -178,76 +178,76 @@ function CatalogContent() {
       return {
         badge: 'SEARCH RESULTS',
         title: `Search for "${searchQuery}"`,
-        subtitle: `Showing all artisanal creations matching your search query.`,
+        subtitle: `Showing fragrances matching your search query.`,
       };
     }
     if (selectedFilter === 'wishlist') {
       return {
         badge: 'SAVED SELECTION',
         title: 'Your Saved Wishlist',
-        subtitle: 'Hand-picked extrait de parfums bookmarked for your signature collection.',
+        subtitle: 'Fragrances saved to your personal collection.',
       };
     }
     if (selectedFilter === 'bestseller' || selectedCategory === 'best-sellers') {
       return {
-        badge: 'ICONIC CREATIONS',
-        title: 'Best Sellers & Crowd Favorites',
-        subtitle: 'Our most sought-after extraits and rare attars celebrated across Bangladesh.',
+        badge: 'BEST SELLERS',
+        title: 'Best Sellers',
+        subtitle: 'Our most loved and requested fragrances.',
       };
     }
     if (selectedFilter === 'new' || selectedCategory === 'new-arrivals') {
       return {
-        badge: 'NEW RELEASES',
-        title: 'New Arrivals & Seasonal Batches',
-        subtitle: 'Recently macerated formulas and contemporary olfactory compositions.',
+        badge: 'NEW ARRIVALS',
+        title: 'New Releases',
+        subtitle: 'Explore our latest fragrance launches and seasonal batches.',
       };
     }
     if (selectedFilter === 'trending') {
       return {
-        badge: 'CURRENTLY TRENDING',
+        badge: 'TRENDING NOW',
         title: 'Trending Fragrances',
-        subtitle: 'Creations commanding the highest attention and praise this season.',
+        subtitle: 'The most popular fragrances and blends this season.',
       };
     }
     if (selectedCategory === 'men') {
       return {
-        badge: 'POUR HOMME',
-        title: "Men's Luxury Fragrances",
-        subtitle: 'Bold woods, smoky leathers, and commanding fresh aromatics crafted for gentlemen.',
+        badge: "MEN'S COLLECTION",
+        title: "Men's Fragrances",
+        subtitle: 'Woody, fresh, spicy, and leather scent profiles crafted for men.',
       };
     }
     if (selectedCategory === 'women') {
       return {
-        badge: 'POUR FEMME',
-        title: "Women's Haute Parfumerie",
-        subtitle: 'Sensual florals, velvet gourmands, and luminous amber bouquets.',
+        badge: "WOMEN'S COLLECTION",
+        title: "Women's Fragrances",
+        subtitle: 'Elegant floral, sweet, fruity, and amber bouquets for women.',
       };
     }
     if (selectedCategory === 'unisex') {
       return {
-        badge: "L'UNIVERSEL",
-        title: 'Unisex Olfactory Creations',
-        subtitle: 'Boundary-defying artisanal compositions transcending gender classifications.',
+        badge: 'UNISEX COLLECTION',
+        title: 'Unisex Fragrances',
+        subtitle: 'Versatile fragrance compositions designed for anyone to wear.',
       };
     }
     if (selectedCategory === 'attar') {
       return {
-        badge: 'PURE OILS',
-        title: 'Pure Concentrated Attars',
-        subtitle: 'Distilled non-alcoholic precious perfume oils with 12+ hour sillage.',
+        badge: 'ATTAR & OILS',
+        title: 'Concentrated Attar Oils',
+        subtitle: 'Pure non-alcoholic perfume oils with long-lasting projection.',
       };
     }
     if (selectedCategory === 'discovery-sets') {
       return {
-        badge: 'COFFRETS & SAMPLERS',
-        title: 'Discovery Sets & Gift Sets',
-        subtitle: 'Curated miniature flacons to experience our complete olfactory universe.',
+        badge: 'DISCOVERY SETS',
+        title: 'Discovery & Gift Sets',
+        subtitle: 'Sample sets to explore multiple fragrances before choosing your favorite.',
       };
     }
     return {
-      badge: 'THE COLLECTION',
-      title: 'Haute Parfumerie Catalog',
-      subtitle: 'Curated artisanal extrait de parfums and natural attars formulated with aged oils.',
+      badge: 'ALL FRAGRANCES',
+      title: 'Fragrance Collection',
+      subtitle: 'Browse our complete catalog of long-lasting perfumes, attars, and sets.',
     };
   }, [searchQuery, selectedFilter, selectedCategory]);
 

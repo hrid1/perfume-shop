@@ -33,7 +33,7 @@ export function CatalogControlsBar({
           <SlidersHorizontal className="w-4 h-4 text-gold-400" />
           <span>Filters</span>
           {activeFiltersCount > 0 && (
-            <span className="w-5 h-5 rounded-full bg-gold-400 text-noir-950 text-[10px] font-mono font-bold flex items-center justify-center">
+            <span className="w-4 h-4 rounded-full bg-gold-400 text-noir-950 text-[10px] font-bold flex items-center justify-center">
               {activeFiltersCount}
             </span>
           )}
@@ -46,7 +46,7 @@ export function CatalogControlsBar({
             type="text"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search in catalog..."
+            placeholder="Search fragrances..."
             className="w-full bg-noir-950/80 border border-noir-800 rounded-lg pl-8 pr-7 py-1.5 text-xs text-noir-200 placeholder:text-noir-500 focus:outline-none focus:border-gold-400/70"
           />
           {searchQuery && (
@@ -60,33 +60,35 @@ export function CatalogControlsBar({
         </div>
       </div>
 
-      {/* Sort Dropdown */}
-      <div className="flex items-center justify-between sm:justify-end gap-3 text-xs">
+      {/* Sort & Filter Controls */}
+      <div className="flex items-center justify-between sm:justify-end gap-4 text-xs">
         {activeFiltersCount > 0 && (
           <button
             onClick={onResetFilters}
-            className="flex items-center gap-1 text-[11px] font-mono text-gold-400 hover:text-gold-300 transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 text-xs text-noir-400 hover:text-gold-400 transition-colors font-medium cursor-pointer"
           >
             <RotateCcw className="w-3 h-3" />
-            <span>Reset</span>
+            <span>Clear filters</span>
           </button>
         )}
 
         <div className="flex items-center gap-2">
-          <ArrowUpDown className="w-3.5 h-3.5 text-noir-400" />
-          <span className="text-noir-400 hidden sm:inline">Sort:</span>
-          <select
-            value={sortBy}
-            onChange={(e) => onSortChange(e.target.value)}
-            className="bg-noir-950 border border-noir-800 rounded-lg px-3 py-1.5 text-xs text-noir-200 focus:outline-none focus:border-gold-400 font-sans cursor-pointer"
-          >
-            <option value="featured">Featured First</option>
-            <option value="bestseller">Bestsellers</option>
-            <option value="rating">Highest Rated</option>
-            <option value="price-low">Price: Low to High</option>
-            <option value="price-high">Price: High to Low</option>
-            <option value="newest">Newest First</option>
-          </select>
+          <span className="text-noir-400 text-xs font-medium hidden sm:inline">Sort by</span>
+          <div className="relative">
+            <select
+              value={sortBy}
+              onChange={(e) => onSortChange(e.target.value)}
+              className="appearance-none bg-noir-950 border border-noir-800 hover:border-noir-700 rounded-lg pl-3 pr-8 py-1.5 text-xs text-noir-200 focus:outline-none focus:border-gold-400 font-sans cursor-pointer transition-colors"
+            >
+              <option value="featured">Featured</option>
+              <option value="bestseller">Best Sellers</option>
+              <option value="rating">Highest Rated</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+              <option value="newest">Newest</option>
+            </select>
+            <ArrowUpDown className="w-3 h-3 text-noir-400 pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2" />
+          </div>
         </div>
       </div>
     </div>

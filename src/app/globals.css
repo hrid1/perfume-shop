@@ -3,6 +3,7 @@
 @theme {
   --font-serif: var(--font-serif), Cormorant Garamond, Georgia, serif;
   --font-sans: var(--font-sans), Inter, system-ui, sans-serif;
+  --font-mono: var(--font-sans), Inter, system-ui, sans-serif;
 
   --color-noir-950: #06060a;
   --color-noir-900: #0d0d12;
@@ -36,7 +37,7 @@
 :root {
   --header-h: 70px;
   --announce-h: 36px;
-  --max-w: 1280px;
+  --max-w: 1440px;
   --background: #06060a;
   --foreground: #f6f6f8;
   --surface: #0d0d12;
@@ -65,13 +66,16 @@ body {
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: #06060a;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #282834;
   border-radius: 9999px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: #d4a84e;
 }
@@ -95,8 +99,15 @@ body {
 
 @media (min-width: 768px) {
   .container-lux {
-    padding-left: 2rem;
-    padding-right: 2rem;
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container-lux {
+    padding-left: 4rem;
+    padding-right: 4rem;
   }
 }
 
@@ -236,12 +247,66 @@ body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fade-in {
   animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Hero staggered entrance */
+@keyframes heroFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Ken-Burns slow scale on hero background */
+@keyframes kenBurns {
+  from { transform: scale(1);    }
+  to   { transform: scale(1.08); }
+}
+
+/* Scroll chevron bounce */
+@keyframes chevronBounce {
+  0%, 100% { transform: translateY(0);    opacity: 0.7; }
+  50%       { transform: translateY(8px); opacity: 1;   }
+}
+
+.hero-fade-up {
+  opacity: 0;
+  animation: heroFadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.hero-fade-in {
+  opacity: 0;
+  animation: heroFadeIn 0.8s ease forwards;
+}
+
+.hero-bg-scale {
+  animation: kenBurns 14s ease-out forwards;
+}
+
+.hero-chevron {
+  animation: chevronBounce 1.8s ease-in-out infinite;
 }
 
 .surface {
@@ -279,4 +344,3 @@ body {
   color: #d4a84e;
   border-color: #d4a84e;
 }
-

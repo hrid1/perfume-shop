@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { Sparkles } from 'lucide-react';
 
 export interface TabItem {
   id: string;
@@ -10,7 +9,7 @@ export interface TabItem {
 }
 
 export const CATALOG_TABS: TabItem[] = [
-  { id: 'all', label: 'All Creations', type: 'category' },
+  { id: 'all', label: 'All Fragrances', type: 'category' },
   { id: 'men', label: 'Men', type: 'category' },
   { id: 'women', label: 'Women', type: 'category' },
   { id: 'unisex', label: 'Unisex', type: 'category' },
@@ -61,10 +60,9 @@ export function CatalogHeader({
     <div className="border-b border-noir-800 pb-8 mb-8">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-[0.2em] text-gold-400 mb-2">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>{badge}</span>
-          </div>
+          <span className="text-xs uppercase tracking-[0.15em] text-gold-400 font-semibold mb-2 block">
+            {badge}
+          </span>
           <h1 className="font-serif text-3xl sm:text-5xl font-semibold text-noir-50 tracking-tight">
             {title}
           </h1>
@@ -73,9 +71,9 @@ export function CatalogHeader({
           </p>
         </div>
 
-        <div className="text-xs font-mono text-noir-400">
-          Showing <strong className="text-gold-300 font-bold">{filteredCount}</strong> of{' '}
-          {totalCreations} creations
+        <div className="text-xs text-noir-400 font-sans">
+          Showing <span className="text-noir-100 font-medium">{filteredCount}</span> of{' '}
+          <span className="text-noir-100 font-medium">{totalCreations}</span> fragrances
         </div>
       </div>
 
@@ -87,7 +85,7 @@ export function CatalogHeader({
             <button
               key={tab.id}
               onClick={() => onTabClick(tab)}
-              className={`px-4 py-2 rounded-full text-xs font-medium uppercase tracking-wider transition-all whitespace-nowrap cursor-pointer ${
+              className={`px-4 py-2 rounded-full text-xs font-medium tracking-wide transition-all whitespace-nowrap cursor-pointer ${
                 active
                   ? 'bg-gold-400 text-noir-950 shadow-md font-semibold'
                   : 'bg-noir-900 border border-noir-800 text-noir-300 hover:text-gold-300 hover:border-gold-400/40'

@@ -23,15 +23,14 @@ export function Footer() {
         {/* Newsletter Section */}
         <div className="bg-gradient-to-r from-noir-900 via-noir-900/80 to-noir-900 border border-noir-800 rounded-2xl p-8 md:p-12 mb-16 text-center max-w-4xl mx-auto shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-gold-500/5 rounded-full blur-3xl -z-10 pointer-events-none" />
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold-400/10 border border-gold-400/20 text-gold-300 text-xs font-mono tracking-wider mb-4">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>THE NOIRÉ CONCIERGE</span>
-          </div>
+          <span className="text-[11px] uppercase tracking-[0.2em] text-gold-400 font-semibold mb-3 block">
+            Exclusive Privileges
+          </span>
           <h3 className="font-serif text-3xl md:text-4xl text-noir-50 font-medium mb-3">
             Join the NOIRÉ Circle
           </h3>
           <p className="text-sm text-noir-400 max-w-md mx-auto mb-6">
-            Receive private allocations, rare maceration notices, and a 10% privilege voucher on your first acquisition.
+            Subscribe to receive private allocations, new batch releases, and 10% off your first order.
           </p>
           <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-2 max-w-md mx-auto">
             <input
@@ -93,27 +92,27 @@ export function Footer() {
             <ul className="space-y-2.5 text-xs text-noir-400">
               <li>
                 <Link href="/catalog?category=men" className="hover:text-gold-300 transition-colors">
-                  Pour Homme (Men)
+                  Men's Fragrances
                 </Link>
               </li>
               <li>
                 <Link href="/catalog?category=women" className="hover:text-gold-300 transition-colors">
-                  Pour Femme (Women)
+                  Women's Fragrances
                 </Link>
               </li>
               <li>
                 <Link href="/catalog?category=unisex" className="hover:text-gold-300 transition-colors">
-                  L’Universel (Unisex)
+                  Unisex Fragrances
                 </Link>
               </li>
               <li>
                 <Link href="/catalog?category=attar" className="hover:text-gold-300 transition-colors">
-                  Pure Concentrated Attar
+                  Pure Attar Oils
                 </Link>
               </li>
               <li>
                 <Link href="/catalog?category=discovery-sets" className="hover:text-gold-300 transition-colors">
-                  Discovery Coffrets
+                  Discovery Sets
                 </Link>
               </li>
             </ul>
@@ -142,7 +141,7 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/catalog?filter=wishlist" className="hover:text-gold-300 transition-colors">
+                <Link href="/wishlist" className="hover:text-gold-300 transition-colors">
                   Curated Wishlist
                 </Link>
               </li>

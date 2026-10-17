@@ -45,12 +45,12 @@ export function ProductGallery({
             </span>
           )}
           {product.newArrival && (
-            <span className="px-2.5 py-1 rounded-full bg-noir-800 border border-gold-400/40 text-gold-300 font-mono text-[10px] uppercase tracking-wider">
+            <span className="px-2.5 py-1 rounded-full bg-noir-800 border border-gold-400/40 text-gold-300 font-medium text-[10px] uppercase tracking-wider">
               New Arrival
             </span>
           )}
           {hasDiscount && (
-            <span className="px-2.5 py-1 rounded-full bg-noir-900/90 border border-noir-700 text-noir-200 font-mono text-[10px] uppercase tracking-wider">
+            <span className="px-2.5 py-1 rounded-full bg-noir-900/90 border border-noir-700 text-noir-200 font-medium text-[10px] uppercase tracking-wider">
               -{discountPct}% OFF
             </span>
           )}

@@ -16,39 +16,41 @@ const FRAGRANCE_FAMILIES = [
 
 export function FragranceFamiliesSection() {
   return (
-    <section className="container-lux">
-      <div className="text-center max-w-2xl mx-auto mb-12">
-        <span className="text-xs font-mono uppercase tracking-[0.2em] text-gold-400">
-          Olfactory Architecture
-        </span>
-        <h2 className="font-serif text-3xl md:text-4xl font-semibold text-noir-50 mt-1">
-          Shop by Fragrance Family
-        </h2>
-        <p className="text-sm text-noir-400 mt-2">
-          Each olfactory family evokes distinct emotional landscapes and sensory moods.
-        </p>
-      </div>
+    <section className="w-full">
+      <div className="container-lux">
+        <div className="text-center max-w-2xl mx-auto mb-12">
+          <span className="text-xs uppercase tracking-[0.16em] text-gold-400 font-medium">
+            Fragrance Families
+          </span>
+          <h2 className="font-serif text-3xl md:text-4xl font-semibold text-noir-50 mt-1">
+            Shop by Scent Profile
+          </h2>
+          <p className="text-sm text-noir-400 mt-2">
+            Find your signature scent based on the notes and accords you love.
+          </p>
+        </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
-        {FRAGRANCE_FAMILIES.map((family) => {
-          const Icon = family.icon;
-          return (
-            <Link
-              key={family.name}
-              href={`/catalog?family=${family.name}`}
-              className="group flex flex-col items-center p-4 rounded-xl bg-noir-900/50 border border-noir-800 hover:border-gold-400/40 hover:-translate-y-1 transition-all duration-300 text-center"
-            >
-              <div
-                className={`w-14 h-14 rounded-full flex items-center justify-center border mb-3 transition-transform duration-300 group-hover:scale-110 ${family.color}`}
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
+          {FRAGRANCE_FAMILIES.map((family) => {
+            const Icon = family.icon;
+            return (
+              <Link
+                key={family.name}
+                href={`/catalog?family=${family.name}`}
+                className="group flex flex-col items-center p-4 rounded-xl bg-noir-900/50 border border-noir-800 hover:border-gold-400/40 hover:-translate-y-1 transition-all duration-300 text-center"
               >
-                <Icon className="w-6 h-6 stroke-1.5" />
-              </div>
-              <span className="text-xs font-medium text-noir-200 group-hover:text-gold-300 transition-colors">
-                {family.name}
-              </span>
-            </Link>
-          );
-        })}
+                <div
+                  className={`w-14 h-14 rounded-full flex items-center justify-center border mb-3 transition-transform duration-300 group-hover:scale-110 ${family.color}`}
+                >
+                  <Icon className="w-6 h-6 stroke-1.5" />
+                </div>
+                <span className="text-xs font-medium text-noir-200 group-hover:text-gold-300 transition-colors">
+                  {family.name}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

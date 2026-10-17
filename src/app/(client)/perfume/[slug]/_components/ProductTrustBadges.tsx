@@ -15,7 +15,7 @@ export function ProductTrustBadges() {
       {TRUST_ITEMS.map(({ icon: Icon, label }) => (
         <div key={label} className="flex flex-col items-center gap-1.5 text-center">
           <Icon className="w-4 h-4 text-gold-400" />
-          <span className="text-[10px] font-mono text-noir-400 uppercase tracking-wide">{label}</span>
+          <span className="text-xs text-noir-300 font-medium">{label}</span>
         </div>
       ))}
     </div>

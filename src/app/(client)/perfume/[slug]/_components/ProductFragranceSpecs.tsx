@@ -41,7 +41,7 @@ export function ProductFragranceSpecs({ product }: ProductFragranceSpecsProps) {
           <div key={label} className="flex items-start gap-2.5">
             <Icon className="w-3.5 h-3.5 text-gold-400/70 mt-0.5 flex-shrink-0" />
             <div>
-              <p className="text-[10px] font-mono uppercase tracking-wider text-noir-500 mb-0.5">
+              <p className="text-[11px] uppercase tracking-wider text-noir-400 font-medium mb-0.5">
                 {label}
               </p>
               <p className="text-sm text-noir-200 font-medium">{value}</p>

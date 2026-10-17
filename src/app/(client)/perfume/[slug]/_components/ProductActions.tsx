@@ -50,11 +50,11 @@ export function ProductActions({
       {/* Brand & Name */}
       <div>
         <div className="flex items-center gap-3 mb-2">
-          <span className="font-mono text-xs uppercase tracking-[0.2em] text-gold-400">
+          <span className="text-xs uppercase tracking-[0.16em] text-gold-400 font-medium">
             {product.brand}
           </span>
           {product.bestSeller && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gold-400/10 border border-gold-400/30 text-gold-300 text-[10px] font-mono uppercase tracking-wider">
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-gold-400/10 border border-gold-400/30 text-gold-300 text-[10px] uppercase tracking-wider font-medium">
               <Sparkles className="w-2.5 h-2.5" /> Best Seller
             </span>
           )}
@@ -81,21 +81,21 @@ export function ProductActions({
             />
           ))}
         </div>
-        <span className="font-mono text-sm font-bold text-gold-300">{product.rating}</span>
-        <span className="text-xs text-noir-400">{product.reviewCount} reviews</span>
+        <span className="text-sm font-semibold text-gold-300">{product.rating}</span>
+        <span className="text-xs text-noir-400">({product.reviewCount} reviews)</span>
       </div>
 
       {/* Price */}
       <div className="flex items-baseline gap-3 flex-wrap">
-        <span className="font-mono text-3xl font-bold text-gold-300">
+        <span className="text-3xl font-bold text-gold-300">
           {formatPrice(currentPrice)}
         </span>
         {hasDiscount && (
           <>
-            <span className="font-mono text-lg text-noir-500 line-through">
+            <span className="text-lg text-noir-500 line-through">
               {formatPrice(originalPrice)}
             </span>
-            <span className="text-xs font-mono bg-gold-400/10 text-gold-300 border border-gold-400/30 px-2 py-0.5 rounded-full">
+            <span className="text-xs bg-gold-400/10 text-gold-300 border border-gold-400/30 px-2.5 py-0.5 rounded-full font-medium">
               Save {formatPrice(originalPrice - currentPrice)}
             </span>
           </>
@@ -108,7 +108,7 @@ export function ProductActions({
       <div>
         <div className="flex items-center justify-between mb-3">
           <span className="text-sm font-semibold text-noir-200 uppercase tracking-wider">Size</span>
-          <span className="text-xs text-noir-400 font-mono">{selectedVariant.size} selected</span>
+          <span className="text-xs text-noir-400">{selectedVariant.size} selected</span>
         </div>
         <div className="flex gap-3 flex-wrap">
           {product.sizes.map((variant) => {
@@ -122,7 +122,7 @@ export function ProductActions({
                   if (!outOfStock) onSelectVariant(variant);
                 }}
                 disabled={outOfStock}
-                className={`relative px-5 py-2.5 rounded-xl border text-sm font-mono transition-all duration-200 cursor-pointer ${
+                className={`relative px-5 py-2.5 rounded-xl border text-sm transition-all duration-200 cursor-pointer ${
                   outOfStock
                     ? 'border-noir-800 text-noir-600 cursor-not-allowed opacity-50'
                     : isSelected
@@ -147,11 +147,11 @@ export function ProductActions({
       <div>
         <div className="flex items-center justify-between mb-3">
           <span className="text-sm font-semibold text-noir-200 uppercase tracking-wider">Quantity</span>
-          <span className="text-xs font-mono">
+          <span className="text-xs">
             {selectedVariant.stock > 0 ? (
-              <span className="text-green-400">{selectedVariant.stock} in stock</span>
+              <span className="text-emerald-400 font-medium">{selectedVariant.stock} in stock</span>
             ) : (
-              <span className="text-red-400">Out of stock</span>
+              <span className="text-rose-400 font-medium">Out of stock</span>
             )}
           </span>
         </div>
@@ -162,7 +162,7 @@ export function ProductActions({
           >
             <Minus className="w-4 h-4" />
           </button>
-          <span className="w-12 text-center font-mono text-base font-bold text-noir-100 border-x border-noir-700">
+          <span className="w-12 text-center text-base font-semibold text-noir-100 border-x border-noir-700">
             {quantity}
           </span>
           <button

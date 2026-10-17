@@ -11,6 +11,7 @@ interface WishlistContextType {
   removeItem: (productId: string) => void;
   totalItems: number;
   count: number;
+  isLoaded: boolean;
 }
 
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
@@ -82,6 +83,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
         removeItem,
         totalItems: items.length,
         count: items.length,
+        isLoaded,
       }}
     >
       {children}
