@@ -9,6 +9,7 @@ interface CatalogFilterSidebarProps {
   selectedFamily: string;
   onFamilyChange: (family: string) => void;
   priceMax: number;
+  maxPrice: number;
   onPriceChange: (val: number) => void;
   activeFiltersCount: number;
   onResetFilters: () => void;
@@ -19,6 +20,7 @@ export function CatalogFilterSidebar({
   selectedFamily,
   onFamilyChange,
   priceMax,
+  maxPrice,
   onPriceChange,
   activeFiltersCount,
   onResetFilters,
@@ -80,7 +82,7 @@ export function CatalogFilterSidebar({
         <input
           type="range"
           min="1500"
-          max="7000"
+          max={maxPrice}
           step="200"
           value={priceMax}
           onChange={(e) => onPriceChange(Number(e.target.value))}
@@ -88,7 +90,7 @@ export function CatalogFilterSidebar({
         />
         <div className="flex justify-between text-[11px] text-noir-500 mt-1">
           <span>৳1,500</span>
-          <span>৳7,000</span>
+          <span>{formatPrice(maxPrice)}</span>
         </div>
       </div>
     </aside>

@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
-import { notFound } from 'next/navigation';
 import { PRODUCTS } from '@/data/mockData';
 import { ProductDetailClient } from './ProductDetailClient';
+import { ProductDetailLookup } from './ProductDetailLookup';
 
 // This route uses client-side context (cart, wishlist) via localStorage,
 // so it must not be prerendered at build time.
@@ -15,8 +15,6 @@ export default async function ProductDetailPage({ params }: Props) {
   const { slug } = await params;
   const product = PRODUCTS.find((p) => p.slug === slug);
 
-  if (!product) return notFound();
-
   return (
     <Suspense
       fallback={
@@ -25,7 +23,11 @@ export default async function ProductDetailPage({ params }: Props) {
         </div>
       }
     >
-      <ProductDetailClient product={product} />
+      {product ? (
+        <ProductDetailClient product={product} />
+      ) : (
+        <ProductDetailLookup slug={slug} />
+      )}
     </Suspense>
   );
 }

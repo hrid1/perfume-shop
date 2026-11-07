@@ -2,7 +2,7 @@
 
 import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import {
   LayoutDashboard,
   Package,
@@ -15,16 +15,17 @@ import {
 } from 'lucide-react';
 
 const NAV_ITEMS = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'products', label: 'Products', icon: Package },
-  { id: 'orders', label: 'Orders', icon: ShoppingCart },
-  { id: 'customers', label: 'Customers', icon: Users },
-  { id: 'coupons', label: 'Coupons', icon: Tag },
-  { id: 'categories', label: 'Categories', icon: FolderTree },
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, href: '/admin' },
+  { id: 'products', label: 'Products', icon: Package, href: '/admin/products' },
+  { id: 'orders', label: 'Orders', icon: ShoppingCart, href: '/admin/orders' },
+  { id: 'customers', label: 'Customers', icon: Users, href: '/admin/customers' },
+  { id: 'coupons', label: 'Coupons', icon: Tag, href: '/admin/coupons' },
+  { id: 'categories', label: 'Categories', icon: FolderTree, href: '/admin/categories' },
 ];
 
 function SidebarContent({ onClose }: { onClose?: () => void }) {
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const currentTab = searchParams.get('tab') || 'dashboard';
 
   return (
@@ -55,12 +56,19 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
         <nav className="space-y-1.5">
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
-            const isActive = currentTab === item.id;
+            const isActive =
+              (item.id === 'dashboard' && pathname === '/admin' && currentTab === 'dashboard') ||
+              (item.id === 'products' &&
+                pathname.startsWith('/admin/products')) ||
+              (item.id === 'orders' && pathname === '/admin/orders') ||
+              (item.id === 'customers' && pathname === '/admin/customers') ||
+              (item.id === 'coupons' && pathname === '/admin/coupons') ||
+              (item.id === 'categories' && pathname === '/admin/categories');
 
             return (
               <Link
                 key={item.id}
-                href={item.id === 'dashboard' ? '/admin' : `/admin?tab=${item.id}`}
+                href={item.href}
                 onClick={onClose}
                 className={`flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                   isActive

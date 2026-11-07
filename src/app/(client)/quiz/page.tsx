@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { QUIZ_QUESTIONS, PRODUCTS } from '@/data/mockData';
+import { QUIZ_QUESTIONS } from '@/data/mockData';
 import { Product } from '@/types';
 import { useCart } from '@/context/CartContext';
+import { useProducts } from '@/context/ProductContext';
 import {
   QuizQuestionStep,
   QuizResultsSection,
@@ -12,6 +13,7 @@ import {
 
 export default function QuizPage() {
   const { addItem } = useCart();
+  const { products } = useProducts();
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [results, setResults] = useState<ScoredProduct[] | null>(null);
@@ -37,7 +39,7 @@ export default function QuizPage() {
     const q4 = finalAnswers.q4; // Budget
     const q5 = finalAnswers.q5; // Sillage
 
-    const scored = PRODUCTS.filter((p) => p.status === 'active' && p.category !== 'discovery-sets').map(
+    const scored = products.filter((p) => p.status === 'active' && p.category !== 'discovery-sets').map(
       (product) => {
         let score = 0;
 

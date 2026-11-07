@@ -55,13 +55,13 @@ export function HeroSection() {
         >
           <Link
             href="/catalog?category=men"
-            className="px-8 sm:px-10 py-3 sm:py-3.5 rounded-full bg-gold-500 hover:bg-gold-400 text-noir-950 font-semibold text-sm sm:text-base tracking-wide transition-all duration-200 shadow-lg shadow-gold-500/20 hover:scale-[1.03] hover:shadow-gold-400/30"
+            className="px-8 sm:px-10 py-3 sm:py-3.5 rounded-full bg-gradient-to-r from-gold-300 via-gold-400 to-gold-500 text-noir-950 font-semibold text-sm sm:text-base tracking-[0.12em] uppercase transition-all duration-200 shadow-[0_14px_32px_rgba(214,168,82,0.45)] border border-gold-200/80 hover:-translate-y-0.5 hover:scale-[1.03] hover:shadow-[0_18px_42px_rgba(214,168,82,0.55)]"
           >
             Shop Men
           </Link>
           <Link
             href="/catalog?category=women"
-            className="px-8 sm:px-10 py-3 sm:py-3.5 rounded-full bg-white/10 hover:bg-white/15 text-white font-medium text-sm sm:text-base tracking-wide border border-white/25 backdrop-blur-sm transition-all duration-200 hover:scale-[1.03]"
+            className="px-8 sm:px-10 py-3 sm:py-3.5 rounded-full bg-white/12 text-white font-medium text-sm sm:text-base tracking-[0.12em] uppercase border border-white/35 backdrop-blur-sm transition-all duration-200 shadow-[0_10px_28px_rgba(0,0,0,0.22)] hover:-translate-y-0.5 hover:scale-[1.03] hover:bg-white/18 hover:border-gold-300/80 hover:text-gold-100"
           >
             Shop Women
           </Link>

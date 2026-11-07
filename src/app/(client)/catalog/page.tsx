@@ -2,8 +2,8 @@
 
 import React, { useState, useMemo, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { PRODUCTS } from '@/data/mockData';
 import { useWishlist } from '@/context/WishlistContext';
+import { useProducts } from '@/context/ProductContext';
 import { FragranceFamily } from '@/types';
 import {
   CatalogHeader,
@@ -11,7 +11,6 @@ import {
   CatalogFilterSidebar,
   CatalogProductGrid,
   CatalogMobileDrawer,
-  type TabItem,
 } from './_components';
 
 const ALL_FAMILIES: FragranceFamily[] = [
@@ -36,6 +35,11 @@ function CatalogContent() {
   const highlightSlug = searchParams.get('highlight');
 
   const { items: wishlistItems } = useWishlist();
+  const { products } = useProducts();
+  const maxPrice = Math.max(
+    7000,
+    ...products.map((product) => product.discountPrice || product.price)
+  );
 
   const [selectedCategory, setSelectedCategory] = useState<string>(urlCategory);
   const [selectedFamily, setSelectedFamily] = useState<string>(urlFamily);
@@ -44,6 +48,10 @@ function CatalogContent() {
   const [sortBy, setSortBy] = useState<string>('featured');
   const [priceMax, setPriceMax] = useState<number>(7000);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+
+  useEffect(() => {
+    setPriceMax(maxPrice);
+  }, [maxPrice]);
 
   // Sync internal state with URL query parameters
   useEffect(() => {
@@ -62,25 +70,6 @@ function CatalogContent() {
     setSearchQuery(urlSearch);
   }, [urlSearch]);
 
-  const handleTabClick = (tab: TabItem) => {
-    const params = new URLSearchParams();
-    if (selectedFamily !== 'all') params.set('family', selectedFamily);
-    if (searchQuery.trim()) params.set('q', searchQuery.trim());
-
-    if (tab.type === 'category') {
-      if (tab.id !== 'all') params.set('category', tab.id);
-      setSelectedCategory(tab.id);
-      setSelectedFilter('all');
-    } else {
-      params.set('filter', tab.id);
-      setSelectedFilter(tab.id);
-      setSelectedCategory('all');
-    }
-
-    const query = params.toString();
-    router.push(`/catalog${query ? `?${query}` : ''}`, { scroll: false });
-  };
-
   const handleFamilyChange = (fam: string) => {
     setSelectedFamily(fam);
     const params = new URLSearchParams(searchParams.toString());
@@ -95,7 +84,7 @@ function CatalogContent() {
 
   // Filter products
   const filteredProducts = useMemo(() => {
-    return PRODUCTS.filter((product) => {
+    return products.filter((product) => {
       // 1. Text search
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -154,13 +143,13 @@ function CatalogContent() {
       if (sortBy === 'newest') return (b.newArrival ? 1 : 0) - (a.newArrival ? 1 : 0);
       return (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
     });
-  }, [selectedCategory, selectedFamily, selectedFilter, priceMax, sortBy, searchQuery, wishlistItems]);
+  }, [products, selectedCategory, selectedFamily, selectedFilter, priceMax, sortBy, searchQuery, wishlistItems]);
 
   const activeFiltersCount =
     (selectedCategory !== 'all' ? 1 : 0) +
     (selectedFilter !== 'all' ? 1 : 0) +
     (selectedFamily !== 'all' ? 1 : 0) +
-    (priceMax < 7000 ? 1 : 0) +
+    (priceMax < maxPrice ? 1 : 0) +
     (searchQuery.trim() ? 1 : 0);
 
   const resetFilters = () => {
@@ -168,7 +157,7 @@ function CatalogContent() {
     setSelectedFamily('all');
     setSelectedFilter('all');
     setSearchQuery('');
-    setPriceMax(7000);
+    setPriceMax(maxPrice);
     setSortBy('featured');
     router.push('/catalog', { scroll: false });
   };
@@ -257,11 +246,8 @@ function CatalogContent() {
         badge={headerInfo.badge}
         title={headerInfo.title}
         subtitle={headerInfo.subtitle}
-        totalCreations={PRODUCTS.length}
+        totalCreations={products.length}
         filteredCount={filteredProducts.length}
-        selectedCategory={selectedCategory}
-        selectedFilter={selectedFilter}
-        onTabClick={handleTabClick}
       />
 
       <CatalogControlsBar
@@ -280,6 +266,7 @@ function CatalogContent() {
           selectedFamily={selectedFamily}
           onFamilyChange={handleFamilyChange}
           priceMax={priceMax}
+          maxPrice={maxPrice}
           onPriceChange={setPriceMax}
           activeFiltersCount={activeFiltersCount}
           onResetFilters={resetFilters}
@@ -299,6 +286,7 @@ function CatalogContent() {
         selectedFamily={selectedFamily}
         onFamilyChange={handleFamilyChange}
         priceMax={priceMax}
+        maxPrice={maxPrice}
         onPriceChange={setPriceMax}
         filteredCount={filteredProducts.length}
         onResetFilters={resetFilters}

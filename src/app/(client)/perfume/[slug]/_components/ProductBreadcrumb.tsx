@@ -16,7 +16,7 @@ export function ProductBreadcrumb({
   productName,
 }: ProductBreadcrumbProps) {
   return (
-    <nav className="flex items-center gap-1.5 text-xs text-noir-400 mb-8 font-sans font-medium flex-wrap">
+    <nav className="flex items-center gap-1.5 text-xs text-noir-400 mb-8 xl:mb-4 font-sans font-medium flex-wrap">
       <Link href="/" className="hover:text-gold-300 transition-colors">Home</Link>
       <ChevronRight className="w-3 h-3" />
       <Link href="/catalog" className="hover:text-gold-300 transition-colors">Catalog</Link>

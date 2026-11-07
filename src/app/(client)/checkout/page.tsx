@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useCart } from '@/context/CartContext';
 import { BANGLADESH_DIVISIONS } from '@/data/mockData';
 import { PaymentMethod } from '@/types';
+import { useCoupons } from '@/context/CouponContext';
 import {
   CheckoutHeader,
   CheckoutEmptyState,
@@ -23,6 +24,7 @@ export default function CheckoutPage() {
     clearCart,
     freeDeliveryThreshold,
   } = useCart();
+  const { markCouponUsed } = useCoupons();
 
   // Form State
   const [fullName, setFullName] = useState('');
@@ -76,6 +78,7 @@ export default function CheckoutPage() {
     setTimeout(() => {
       const generatedOrderNumber = `NR-2025-${Math.floor(1000 + Math.random() * 9000)}`;
       setPlacedOrderNumber(generatedOrderNumber);
+      if (couponCode) markCouponUsed(couponCode);
       clearCart();
       setIsSubmitting(false);
     }, 1200);

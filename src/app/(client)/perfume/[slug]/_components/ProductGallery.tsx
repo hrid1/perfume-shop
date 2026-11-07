@@ -25,25 +25,20 @@ export function ProductGallery({
   discountPct,
 }: ProductGalleryProps) {
   return (
-    <div className="flex flex-col gap-4">
-      <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-noir-900 border border-noir-800/80">
+    <div className="flex flex-col gap-4 lg:gap-3">
+      <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-noir-900 border border-noir-800/80 lg:aspect-auto lg:h-[min(68svh,640px)] xl:h-[min(56svh,440px)]">
         <Image
           src={product.images[activeImage] ?? product.images[0]}
           alt={product.name}
           fill
           priority
           sizes="(max-width: 1024px) 100vw, 50vw"
-          className="object-cover transition-all duration-500 brightness-90 contrast-105"
+          className="object-contain transition-all duration-500 brightness-90 contrast-105"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-noir-950/60 via-transparent to-transparent" />
 
         {/* Badges */}
         <div className="absolute top-4 left-4 flex flex-col gap-2">
-          {product.bestSeller && (
-            <span className="px-2.5 py-1 rounded-full bg-gold-400 text-noir-950 font-bold text-[10px] uppercase tracking-wider shadow-md">
-              Best Seller
-            </span>
-          )}
           {product.newArrival && (
             <span className="px-2.5 py-1 rounded-full bg-noir-800 border border-gold-400/40 text-gold-300 font-medium text-[10px] uppercase tracking-wider">
               New Arrival
@@ -69,12 +64,12 @@ export function ProductGallery({
       </div>
 
       {product.images.length > 1 && (
-        <div className="flex gap-3">
+        <div className="flex gap-3 lg:gap-2">
           {product.images.map((img, i) => (
             <button
               key={i}
               onClick={() => onSelectImage(i)}
-              className={`relative w-20 h-24 rounded-xl overflow-hidden border-2 transition-all duration-200 flex-shrink-0 cursor-pointer ${
+              className={`relative w-20 h-24 lg:w-16 lg:h-20 rounded-xl overflow-hidden border-2 transition-all duration-200 flex-shrink-0 cursor-pointer ${
                 activeImage === i
                   ? 'border-gold-400 shadow-[0_0_12px_rgba(212,168,78,0.35)]'
                   : 'border-noir-800 hover:border-noir-600'

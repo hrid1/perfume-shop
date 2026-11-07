@@ -13,6 +13,7 @@ interface CatalogMobileDrawerProps {
   selectedFamily: string;
   onFamilyChange: (family: string) => void;
   priceMax: number;
+  maxPrice: number;
   onPriceChange: (val: number) => void;
   filteredCount: number;
   onResetFilters: () => void;
@@ -25,6 +26,7 @@ export function CatalogMobileDrawer({
   selectedFamily,
   onFamilyChange,
   priceMax,
+  maxPrice,
   onPriceChange,
   filteredCount,
   onResetFilters,
@@ -90,7 +92,7 @@ export function CatalogMobileDrawer({
           <input
             type="range"
             min="1500"
-            max="7000"
+            max={maxPrice}
             step="200"
             value={priceMax}
             onChange={(e) => onPriceChange(Number(e.target.value))}
@@ -98,7 +100,7 @@ export function CatalogMobileDrawer({
           />
           <div className="flex justify-between text-[11px] text-noir-500 mt-1">
             <span>৳1,500</span>
-            <span>৳7,000</span>
+            <span>{formatPrice(maxPrice)}</span>
           </div>
         </div>
 

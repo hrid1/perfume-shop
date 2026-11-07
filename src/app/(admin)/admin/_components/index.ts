@@ -1,4 +1,4 @@
-export { DashboardOverviewSection, type MockOrder } from './DashboardOverviewSection';
+export { DashboardOverviewSection, type MockOrder, type OrderActionStatus } from './DashboardOverviewSection';
 export { ProductsManagementSection } from './ProductsManagementSection';
 export { OrdersManagementSection } from './OrdersManagementSection';
 export { CustomersSection, type CustomerItem } from './CustomersSection';

@@ -16,9 +16,9 @@ import {
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { useAuth } from '@/context/AuthContext';
-import { productsService } from '@/services';
 import { formatPrice } from '@/config/app';
 import type { Product } from '@/types';
+import { useProducts } from '@/context/ProductContext';
 import { Drawer } from './Modal';
 
 // Next.js Link adapter supporting both `to` and `href`
@@ -36,7 +36,9 @@ const navLinks = [
   { label: 'Women', to: '/catalog?category=women' },
   { label: 'Unisex', to: '/catalog?category=unisex' },
   { label: 'Attar', to: '/catalog?category=attar' },
-  { label: 'Discovery Sets', to: '/catalog?category=discovery-sets' },
+  { label: 'Wax', to: '/catalog?category=wax' },
+  { label: 'Body Mist', to: '/catalog?category=body-mist' },
+  // { label: 'Discovery Sets', to: '/catalog?category=discovery-sets' },
   { label: 'New Arrivals', to: '/catalog?filter=new' },
   { label: 'Best Sellers', to: '/catalog?filter=bestseller' },
 ];
@@ -51,6 +53,7 @@ export function Navbar() {
   const { totalItems, openCart } = useCart();
   const { count: wishCount } = useWishlist();
   const { isAuthenticated } = useAuth();
+  const { products } = useProducts();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -106,13 +109,21 @@ export function Navbar() {
       return;
     }
     setSearching(true);
-    const timer = setTimeout(async () => {
-      const results = await productsService.search(searchQuery);
+    const timer = setTimeout(() => {
+      const query = searchQuery.trim().toLowerCase();
+      const results = products.filter((product) =>
+        product.name.toLowerCase().includes(query) ||
+        product.brand.toLowerCase().includes(query) ||
+        product.fragranceFamily.toLowerCase().includes(query) ||
+        product.category.toLowerCase().includes(query) ||
+        product.topNotes.some((note) => note.toLowerCase().includes(query)) ||
+        product.baseNotes.some((note) => note.toLowerCase().includes(query))
+      );
       setSearchResults(results.slice(0, 6));
       setSearching(false);
     }, 250);
     return () => clearTimeout(timer);
-  }, [searchQuery]);
+  }, [searchQuery, products]);
 
   return (
     <>

@@ -12,6 +12,8 @@ import {
 } from 'lucide-react';
 import { formatPrice } from '@/config/app';
 
+export type OrderActionStatus = 'new' | 'action_taken';
+
 export interface MockOrder {
   id: string;
   orderNumber: string;
@@ -22,6 +24,7 @@ export interface MockOrder {
   total: number;
   paymentMethod: string;
   status: 'processing' | 'shipped' | 'delivered';
+  actionStatus?: OrderActionStatus;
   date: string;
 }
 
@@ -34,6 +37,9 @@ export function DashboardOverviewSection({
   orders,
   salesData,
 }: DashboardOverviewSectionProps) {
+  const pendingOrdersCount = orders.filter(
+    (o) => (o.actionStatus || 'new') === 'new' || o.status === 'processing'
+  ).length;
   return (
     <div className="animate-fade-in">
       {/* Header */}
@@ -103,7 +109,7 @@ export function DashboardOverviewSection({
           <div className="mt-4">
             <p className="text-xs text-noir-400 font-medium tracking-wide">Pending Orders</p>
             <p className="font-serif text-2xl md:text-3xl font-bold text-cream-50 mt-0.5 tracking-tight">
-              0
+              {pendingOrdersCount}
             </p>
           </div>
         </div>
@@ -157,7 +163,7 @@ export function DashboardOverviewSection({
             Recent Orders
           </h2>
           <Link
-            href="/admin?tab=orders"
+            href="/admin/orders"
             className="text-xs font-medium text-gold-400 hover:text-gold-300 flex items-center gap-1 transition-colors"
           >
             <span>View all orders</span>
@@ -172,9 +178,17 @@ export function DashboardOverviewSection({
               className="py-4 flex items-center justify-between hover:bg-noir-800/40 px-3 rounded-xl transition-colors"
             >
               <div>
-                <p className="font-semibold text-sm text-cream-50 tracking-tight">
-                  {order.orderNumber}
-                </p>
+                <div className="flex items-center gap-2">
+                  <p className="font-semibold text-sm text-cream-50 tracking-tight">
+                    {order.orderNumber}
+                  </p>
+                  {(order.actionStatus || 'new') === 'new' && (
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-rose-500/15 border border-rose-500/30 text-rose-300">
+                      <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
+                      New
+                    </span>
+                  )}
+                </div>
                 <p className="text-xs text-noir-400 mt-0.5">
                   {order.customerName}
                 </p>

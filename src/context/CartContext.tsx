@@ -2,9 +2,9 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { CartItem, Product, ProductVariant } from '@/types';
-import { COUPONS } from '@/data/mockData';
 import { config } from '@/config/app';
 import { useToast } from './ToastContext';
+import { useCoupons } from './CouponContext';
 
 interface CartContextType {
   items: CartItem[];
@@ -40,6 +40,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const { success, error } = useToast();
+  const { coupons } = useCoupons();
 
   // Load from LocalStorage
   useEffect(() => {
@@ -142,11 +143,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const applyCoupon = (code: string) => {
     const cleanCode = code.trim().toUpperCase();
-    const found = COUPONS.find((c) => c.code === cleanCode && c.active);
+    const found = coupons.find((c) => c.code === cleanCode && c.active);
 
     if (!found) {
       error('Invalid promo code');
       return { success: false, message: 'Invalid promo code' };
+    }
+
+    if (found.expiryDate && new Date(`${found.expiryDate}T23:59:59`) < new Date()) {
+      error('This promo code has expired');
+      return { success: false, message: 'This promo code has expired' };
+    }
+
+    if (found.usedCount >= found.usageLimit) {
+      error('This promo code has reached its usage limit');
+      return { success: false, message: 'This promo code has reached its usage limit' };
     }
 
     if (subtotal < found.minOrder) {

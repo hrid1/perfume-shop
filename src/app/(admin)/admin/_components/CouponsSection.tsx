@@ -1,6 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { Plus } from 'lucide-react';
 import { Coupon } from '@/types';
 import { formatPrice } from '@/config/app';
 
@@ -9,15 +11,32 @@ interface CouponsSectionProps {
 }
 
 export function CouponsSection({ coupons }: CouponsSectionProps) {
+  const [today, setToday] = useState('');
+
+  useEffect(() => {
+    setToday(new Date().toISOString().slice(0, 10));
+  }, []);
+
   return (
     <div className="animate-fade-in">
       <div className="mb-6">
-        <h1 className="font-serif text-3xl font-normal text-cream-50">
-          Promotional Coupons ({coupons.length})
-        </h1>
-        <p className="text-xs text-noir-400 mt-1">
-          Active promotional discount codes for boutique clients.
-        </p>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="font-serif text-3xl font-normal text-cream-50">
+              Promotional Coupons ({coupons.length})
+            </h1>
+            <p className="text-xs text-noir-400 mt-1">
+              Create and manage promotional discount codes for boutique clients.
+            </p>
+          </div>
+          <Link
+            href="/admin/coupons/new"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-gold-400 px-4 py-2.5 text-sm font-semibold text-noir-950 transition-colors hover:bg-gold-300"
+          >
+            <Plus className="h-4 w-4" />
+            Create coupon
+          </Link>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -31,8 +50,18 @@ export function CouponsSection({ coupons }: CouponsSectionProps) {
                 <span className="font-mono text-sm font-bold px-3 py-1 bg-gold-500/15 text-gold-300 rounded-lg border border-gold-500/30">
                   {cpn.code}
                 </span>
-                <span className="text-xs text-emerald-400 font-semibold bg-emerald-500/15 border border-emerald-500/20 px-2 py-0.5 rounded-full">
-                  Active
+                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${
+                  !cpn.active || cpn.usedCount >= cpn.usageLimit || (today && cpn.expiryDate < today)
+                    ? 'text-noir-400 bg-noir-800 border-noir-700'
+                    : 'text-emerald-400 bg-emerald-500/15 border-emerald-500/20'
+                }`}>
+                  {!cpn.active
+                    ? 'Inactive'
+                    : cpn.usedCount >= cpn.usageLimit
+                    ? 'Limit reached'
+                    : today && cpn.expiryDate < today
+                    ? 'Expired'
+                    : 'Active'}
                 </span>
               </div>
               <p className="text-xs text-noir-400 mb-1">Promo Code &bull; Valid for boutique orders</p>
@@ -44,7 +73,7 @@ export function CouponsSection({ coupons }: CouponsSectionProps) {
             </div>
             <div className="mt-4 pt-4 border-t border-noir-800 text-xs text-noir-400 flex items-center justify-between">
               <span>Min order: {formatPrice(cpn.minOrder)}</span>
-              <span className="font-mono">Used: {cpn.usedCount}</span>
+              <span className="font-mono">Used: {cpn.usedCount}/{cpn.usageLimit}</span>
             </div>
           </div>
         ))}

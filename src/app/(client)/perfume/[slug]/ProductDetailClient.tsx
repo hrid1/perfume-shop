@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Product, ProductVariant } from '@/types';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
@@ -19,7 +20,8 @@ interface Props {
 }
 
 export function ProductDetailClient({ product }: Props) {
-  const { addItem } = useCart();
+  const router = useRouter();
+  const { addItem, closeCart } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
 
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant>(product.sizes[0]);
@@ -45,20 +47,22 @@ export function ProductDetailClient({ product }: Props) {
 
   const handleBuyNow = () => {
     addItem(product, selectedVariant, quantity);
+    closeCart();
+    router.push('/checkout');
   };
 
   const categoryLabel =
     product.category.charAt(0).toUpperCase() + product.category.slice(1);
 
   return (
-    <div className="container-lux py-8 md:py-12 animate-fade-in">
+    <div className="container-lux py-8 md:py-12 xl:py-6 animate-fade-in">
       <ProductBreadcrumb
         category={product.category}
         categoryLabel={categoryLabel}
         productName={product.name}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 xl:gap-16">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 xl:gap-8">
         <ProductGallery
           product={product}
           activeImage={activeImage}
@@ -69,7 +73,7 @@ export function ProductDetailClient({ product }: Props) {
           discountPct={discountPct}
         />
 
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 xl:gap-4">
           <ProductActions
             product={product}
             selectedVariant={selectedVariant}

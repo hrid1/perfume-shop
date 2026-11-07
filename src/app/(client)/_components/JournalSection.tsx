@@ -1,30 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Clock } from 'lucide-react';
-
-const JOURNAL_POSTS = [
-  {
-    title: 'Extrait vs Eau de Parfum: What Concentration Means',
-    category: 'Guide',
-    readTime: '4 min read',
-    image: 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?q=80&w=800&auto=format&fit=crop',
-    excerpt: 'Understanding oil concentrations, longevity, and how high-potency perfumes interact with skin.',
-  },
-  {
-    title: 'Fragrance Longevity in Tropical Climates',
-    category: 'Tips',
-    readTime: '5 min read',
-    image: 'https://images.unsplash.com/photo-1547887537-6158d64c35b3?q=80&w=800&auto=format&fit=crop',
-    excerpt: 'Practical advice on pulse points, moisture prep, and fabrics to keep your scent projecting all day.',
-  },
-  {
-    title: 'The Art of Natural Attar & Aged Oud Oils',
-    category: 'Heritage',
-    readTime: '6 min read',
-    image: 'https://images.unsplash.com/photo-1615397349754-cfa2066a298e?q=80&w=800&auto=format&fit=crop',
-    excerpt: 'Traditional hydro-distillation and natural aging: the craftsmanship behind authentic attars.',
-  },
-];
+import { JOURNAL_POSTS } from '@/data/journalPosts';
 
 export function JournalSection() {
   return (
@@ -43,7 +20,7 @@ export function JournalSection() {
             </p>
           </div>
           <Link
-            href="/catalog"
+            href="/journal"
             className="mt-4 md:mt-0 text-xs uppercase tracking-wider text-gold-400 hover:text-gold-300 flex items-center gap-1 group font-medium"
           >
             <span>Browse All Articles</span>
@@ -53,8 +30,8 @@ export function JournalSection() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {JOURNAL_POSTS.map((post) => (
-            <div
-              key={post.title}
+            <article
+              key={post.slug}
               className="group card-lux overflow-hidden border border-noir-800 bg-noir-900/60 flex flex-col justify-between"
             >
               <div className="relative aspect-[16/10] bg-noir-950 overflow-hidden">
@@ -82,12 +59,15 @@ export function JournalSection() {
                   <p className="text-xs text-noir-400 line-clamp-2 leading-relaxed font-light">{post.excerpt}</p>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-noir-800/80 flex items-center gap-1 text-xs text-gold-400 font-medium">
+                <Link
+                  href={`/journal/${post.slug}`}
+                  className="mt-4 pt-3 border-t border-noir-800/80 flex items-center gap-1 text-xs text-gold-400 font-medium"
+                >
                   <span>Read Article</span>
                   <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-                </div>
+                </Link>
               </div>
-            </div>
+            </article>
           ))}
         </div>
       </div>

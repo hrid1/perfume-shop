@@ -8,7 +8,7 @@ import { WishlistItem, Product } from '@/types';
 import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
 import { formatPrice } from '@/config/app';
-import { PRODUCTS } from '@/data/mockData';
+import { useProducts } from '@/context/ProductContext';
 
 interface WishlistCardProps {
   item: WishlistItem;
@@ -17,6 +17,7 @@ interface WishlistCardProps {
 export function WishlistCard({ item }: WishlistCardProps) {
   const { removeItem } = useWishlist();
   const { addItem } = useCart();
+  const { products } = useProducts();
 
   const handleRemove = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -28,8 +29,7 @@ export function WishlistCard({ item }: WishlistCardProps) {
     e.preventDefault();
     e.stopPropagation();
 
-    // Look up full product in mock catalogue for variants
-    const product = PRODUCTS.find(
+    const product = products.find(
       (p) => p.id === item.productId || p.slug === item.slug
     );
 
