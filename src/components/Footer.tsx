@@ -13,7 +13,7 @@ export function Footer() {
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
-    success('Welcome to the NOIRÉ Circle. Your private invitation code has been sent.');
+    success('Welcome to the Amros Perfumes community. Your private invitation code has been sent.');
     setEmail('');
   };
 
@@ -27,7 +27,7 @@ export function Footer() {
             Exclusive Privileges
           </span>
           <h3 className="font-serif text-3xl md:text-4xl text-noir-50 font-medium mb-3">
-            Join the NOIRÉ Circle
+            Join the Amros Perfumes Circle
           </h3>
           <p className="text-sm text-noir-400 max-w-md mx-auto mb-6">
             Subscribe to receive private allocations, new batch releases, and 10% off your first order.
@@ -53,7 +53,7 @@ export function Footer() {
           {/* Brand Info */}
           <div>
             <Link href="/" className="inline-block font-serif text-2xl font-bold tracking-[0.2em] text-noir-50 mb-4">
-              NOIR<span className="text-gold-400">É</span>
+              AMROS<span className="text-gold-400"> PERFUMES</span>
             </Link>
             <p className="text-xs text-noir-400 leading-relaxed mb-4">
               Artisanal French & Oriental haute perfumery blended with exceptional maceration protocols. Crafted in limited batches for discerning connoisseurs.
@@ -169,7 +169,7 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-gold-400 shrink-0" />
-                <span>concierge@noireperfumes.com</span>
+                <span>concierge@amrosperfumes.com</span>
               </li>
               <li className="text-[11px] text-noir-500 pt-2 border-t border-noir-800">
                 Nationwide express delivery (Dhaka ৳60 &bull; Outside Dhaka ৳120)
@@ -180,7 +180,7 @@ export function Footer() {
 
         {/* Bottom Bar & Payment Badges */}
         <div className="pt-8 border-t border-noir-800/80 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-noir-500">
-          <p>© 2025 NOIRÉ Luxury Perfume House. All rights reserved.</p>
+          <p>© 2026 Amros Perfumes. All rights reserved.</p>
 
           {/* Bangladesh Payment Badges */}
           <div className="flex items-center gap-2 flex-wrap">

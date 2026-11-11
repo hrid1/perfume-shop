@@ -1,7 +1,17 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Clock } from 'lucide-react';
+import type { Metadata } from 'next';
 import { JOURNAL_POSTS } from '@/data/journalPosts';
+
+export const metadata: Metadata = {
+  title: 'Fragrance Guides & Perfume Journal',
+  description:
+    'Read fragrance guides, perfume tips, and stories about attars, oud, and choosing scents for Bangladesh’s climate from Amros Perfumes.',
+  alternates: {
+    canonical: '/journal',
+  },
+};
 
 export default function JournalPage() {
   return (
@@ -19,7 +29,7 @@ export default function JournalPage() {
           Fragrance Guides
         </span>
         <h1 className="mt-2 font-serif text-4xl font-semibold text-noir-50 sm:text-5xl">
-          The NOIRÉ Journal
+          The Amros Perfumes Journal
         </h1>
         <p className="mt-3 max-w-xl text-sm leading-relaxed text-noir-400">
           Explore fragrance guides, practical tips, and stories behind the art of perfumery.

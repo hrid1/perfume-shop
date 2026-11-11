@@ -35,7 +35,7 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
         <div className="px-3 py-4 mb-4 flex items-center justify-between">
           <div>
             <div className="font-serif text-2xl font-bold tracking-widest text-cream-50">
-              NOIR<span className="text-gold-400">É</span>
+              AMROS<span className="text-gold-400"> PERFUMES</span>
             </div>
             <p className="text-xs text-noir-400 tracking-wider mt-0.5 font-sans">
               Admin Panel
@@ -108,7 +108,7 @@ export function AdminSidebar() {
       <div className="lg:hidden sticky top-0 z-40 bg-noir-950 border-b border-noir-800 px-4 py-3 flex items-center justify-between">
         <div>
           <span className="font-serif text-xl font-bold tracking-widest text-cream-50">
-            NOIR<span className="text-gold-400">É</span>
+            AMROS<span className="text-gold-400"> PERFUMES</span>
           </span>
           <span className="text-[11px] text-noir-400 ml-2 font-mono">Admin</span>
         </div>

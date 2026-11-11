@@ -2,10 +2,41 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, Clock } from 'lucide-react';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import { JOURNAL_POSTS } from '@/data/journalPosts';
 
 export function generateStaticParams() {
   return JOURNAL_POSTS.map((post) => ({ slug: post.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const post = JOURNAL_POSTS.find((article) => article.slug === slug);
+
+  if (!post) {
+    return {
+      title: 'Article not found',
+      robots: { index: false, follow: true },
+    };
+  }
+
+  return {
+    title: post.title,
+    description: post.excerpt,
+    alternates: {
+      canonical: `/journal/${post.slug}`,
+    },
+    openGraph: {
+      type: 'article',
+      title: post.title,
+      description: post.excerpt,
+      images: [post.image],
+    },
+  };
 }
 
 export default async function JournalArticlePage({

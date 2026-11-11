@@ -21,7 +21,7 @@ export function CategoriesSection({
           Product Categories ({categories.length})
         </h1>
         <p className="text-xs text-noir-400 mt-1">
-          High-level olfactory groupings configured in NOIRÉ.
+          High-level olfactory groupings configured in Amros Perfumes.
         </p>
       </div>
 

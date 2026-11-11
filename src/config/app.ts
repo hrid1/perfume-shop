@@ -1,9 +1,10 @@
 export const config = {
   brand: {
-    name: 'NOIRÉ',
+    name: 'Amros Perfumes',
     tagline: 'Sensory Elegance Bottled in Darkness.',
     description: 'Artisanal haute perfumery crafted with pure extracts and timeless allure.',
   },
+  siteUrl: 'https://www.amrosperfumes.com',
   delivery: {
     insideDhaka: 60,
     outsideDhaka: 120,
@@ -15,12 +16,12 @@ export const config = {
   },
   contact: {
     phone: '+880 1700-000000',
-    email: 'concierge@noireperfumes.com',
+    email: 'concierge@amrosperfumes.com',
     address: 'Gulshan 2, Dhaka 1212, Bangladesh',
   },
   social: {
-    instagram: 'https://instagram.com/noire.perfumes',
-    facebook: 'https://facebook.com/noire.perfumes',
+    instagram: 'https://instagram.com/amrosperfumes',
+    facebook: 'https://facebook.com/amrosperfumes',
   },
 };
 

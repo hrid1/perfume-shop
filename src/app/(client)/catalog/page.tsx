@@ -300,7 +300,7 @@ export default function CatalogPage() {
     <Suspense
       fallback={
         <div className="container-lux py-20 text-center text-noir-400">
-          Loading the NOIRÉ collection...
+          Loading the Amros Perfumes collection...
         </div>
       }
     >

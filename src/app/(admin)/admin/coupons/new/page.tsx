@@ -113,7 +113,7 @@ export default function NewCouponPage() {
               maxLength={30}
               value={code}
               onChange={(event) => setCode(event.target.value.toUpperCase())}
-              placeholder="e.g. NOIRE15"
+              placeholder="e.g. AMROS15"
               className={inputClass}
             />
           </label>

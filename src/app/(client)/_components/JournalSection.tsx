@@ -13,7 +13,7 @@ export function JournalSection() {
               Fragrance Guides
             </span>
             <h2 className="font-serif text-3xl md:text-4xl font-semibold text-noir-50 mt-1">
-              The NOIRÉ Journal
+              The Amros Perfumes Journal
             </h2>
             <p className="text-sm text-noir-400 mt-1">
               Guides on fragrance notes, longevity, and seasonal choices.

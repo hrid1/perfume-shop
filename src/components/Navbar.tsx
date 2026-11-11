@@ -156,7 +156,7 @@ export function Navbar() {
             {/* Logo */}
             <Link to="/" className="flex-shrink-0">
               <span className="font-serif text-2xl md:text-3xl font-semibold tracking-tight text-cream-50">
-                NOIR<span className="text-gold-500">É</span>
+                AMROS<span className="text-gold-500"> PERFUMES</span>
               </span>
             </Link>
 
@@ -330,7 +330,7 @@ export function Navbar() {
         <div className="p-4 flex flex-col h-full">
           <div className="flex items-center justify-between mb-6">
             <span className="font-serif text-2xl font-semibold text-cream-50">
-              NOIR<span className="text-gold-500">É</span>
+              AMROS<span className="text-gold-500"> PERFUMES</span>
             </span>
             <button
               onClick={() => setMenuOpen(false)}

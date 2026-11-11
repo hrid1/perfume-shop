@@ -117,7 +117,7 @@ export function WishlistCard({ item }: WishlistCardProps) {
         <div>
           {/* Brand */}
           <p className="text-[11px] uppercase tracking-widest text-gold-400/80 font-medium mb-1">
-            {item.brand || 'NOIRÉ'}
+            {item.brand || 'Amros Perfumes'}
           </p>
 
           {/* Name */}

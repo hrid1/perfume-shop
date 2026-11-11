@@ -35,7 +35,7 @@ const REVIEWS_ROW_1: ReviewItem[] = [
   {
     name: 'Mahmud Hasan',
     location: 'Sylhet',
-    product: 'NOIRÉ Discovery Set',
+    product: 'Amros Perfumes Discovery Set',
     rating: 5,
     comment:
       'Ordering the discovery set first was the best decision. The ৳500 voucher on the full bottle made it incredible value. Now completely hooked on Amber Oud Royale.',
@@ -155,7 +155,7 @@ export function ReviewsSection() {
             Client Voices
           </span>
           <h2 className="font-serif text-3xl md:text-5xl font-semibold text-noir-50 mt-1">
-            Stories from the NOIRÉ Community
+            Stories from the Amros Perfumes Community
           </h2>
           <p className="text-sm text-noir-400 mt-2">
             Real feedback from fragrance connoisseurs and collectors across Bangladesh.

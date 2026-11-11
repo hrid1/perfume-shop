@@ -10,7 +10,7 @@ export function DiscoverySetsSection() {
           <div className="relative aspect-[4/3] lg:aspect-auto lg:h-full min-h-[360px] bg-noir-950">
             <Image
               src="https://images.unsplash.com/photo-1547887537-6158d64c35b3?q=80&w=1200&auto=format&fit=crop"
-              alt="NOIRÉ Discovery Sets"
+              alt="Amros Perfumes discovery sets"
               fill
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover filter brightness-90 contrast-110"
@@ -23,7 +23,7 @@ export function DiscoverySetsSection() {
               Sample Before You Decide
             </span>
             <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-noir-50 mt-2 mb-4 leading-snug">
-              NOIRÉ Discovery Sets
+              Amros Perfumes Discovery Sets
             </h2>
             <p className="text-sm text-noir-300 mb-6 leading-relaxed font-light">
               Experience five of our most popular fragrances in travel-friendly 2ml glass
