@@ -17,9 +17,7 @@ export function BestSellersSection() {
             <h2 className="font-serif text-3xl md:text-4xl font-semibold text-noir-50 mt-1">
               Best Sellers
             </h2>
-            <p className="text-sm text-noir-400 mt-1">
-              Our most loved and requested fragrances across Bangladesh.
-            </p>
+          
           </div>
           <Link
             href="/catalog?filter=bestseller"

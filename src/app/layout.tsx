@@ -22,18 +22,27 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(config.siteUrl),
   title: {
-    default: 'Amros Perfumes | Buy Perfumes Online in Bangladesh',
+    default: 'Amros Perfumes | Official Online Perfume Store Bangladesh',
     template: '%s | Amros Perfumes',
   },
   description:
-    'Shop perfumes online in Bangladesh with Amros Perfumes. Explore men’s, women’s and unisex fragrances, attars, and discovery sets.',
+    'Official website of Amros Perfumes. Buy premium long-lasting perfumes, inspired luxury fragrances, pure attars, and discovery sets online in Bangladesh with cash on delivery.',
   keywords: [
-    'perfume shop Bangladesh',
-    'buy perfume online Bangladesh',
-    'perfumes for men Bangladesh',
-    'perfumes for women Bangladesh',
-    'attar Bangladesh',
-    'unisex perfume Bangladesh',
+    'amros perfume',
+    'amros perfumes',
+    'amros',
+    'amros bd',
+    'amros perfume bangladesh',
+    'amros perfume barisal',
+    'amros perfumes online',
+    'amros perfume price in bangladesh',
+    'buy perfume online bangladesh',
+    'perfume shop bangladesh',
+    'perfumes for men bangladesh',
+    'perfumes for women bangladesh',
+    'attar bangladesh',
+    'unisex perfume bangladesh',
+    'long lasting perfume bd',
   ],
   alternates: {
     canonical: '/',
@@ -42,24 +51,24 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_BD',
     siteName: 'Amros Perfumes',
-    title: 'Amros Perfumes | Buy Perfumes Online in Bangladesh',
+    title: 'Amros Perfumes | Official Online Perfume Store Bangladesh',
     description:
-      'Explore men’s, women’s and unisex fragrances, attars, and discovery sets at Amros Perfumes.',
-    url: '/',
+      'Official website of Amros Perfumes. Explore premium long-lasting perfumes, attars, and inspired luxury fragrances across Bangladesh.',
+    url: 'https://www.amrosperfumes.com',
     images: [
       {
         url: '/icon.png',
         width: 512,
         height: 512,
-        alt: 'Amros Perfumes',
+        alt: 'Amros Perfumes Bangladesh',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Amros Perfumes | Buy Perfumes Online in Bangladesh',
+    title: 'Amros Perfumes | Official Online Perfume Store Bangladesh',
     description:
-      'Explore fragrances, attars, and discovery sets at Amros Perfumes.',
+      'Official store of Amros Perfumes. Premium long-lasting perfumes, attars, and discovery sets in Bangladesh.',
     images: ['/icon.png'],
   },
   robots: {
@@ -82,6 +91,9 @@ export const metadata: Metadata = {
       { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
     ],
   },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+  },
 };
 
 export default function RootLayout({
@@ -99,16 +111,45 @@ export default function RootLayout({
               '@context': 'https://schema.org',
               '@graph': [
                 {
-                  '@type': 'Organization',
+                  '@type': ['Organization', 'OnlineStore'],
+                  '@id': `${config.siteUrl}/#organization`,
                   name: 'Amros Perfumes',
+                  alternateName: ['Amros', 'Amros BD', 'Amros Perfumes Bangladesh', 'Amros Perfume'],
                   url: config.siteUrl,
                   logo: `${config.siteUrl}/icon.png`,
+                  image: `${config.siteUrl}/icon.png`,
+                  description:
+                    'Amros Perfumes is a premium fragrance house in Bangladesh offering long-lasting luxury perfumes, pure attar oils, and inspired scents.',
+                  telephone: '+880 1700-000000',
+                  email: 'concierge@amrosperfumes.com',
+                  address: {
+                    '@type': 'PostalAddress',
+                    streetAddress: 'Gulshan 2',
+                    addressLocality: 'Dhaka',
+                    postalCode: '1212',
+                    addressCountry: 'BD',
+                  },
+                  sameAs: [
+                    'https://www.facebook.com/amrosperfumes',
+                    'https://www.instagram.com/amrosbd',
+                  ],
+                  priceRange: '৳৳',
                 },
                 {
                   '@type': 'WebSite',
+                  '@id': `${config.siteUrl}/#website`,
                   name: 'Amros Perfumes',
+                  alternateName: 'Amros Perfume',
                   url: config.siteUrl,
                   inLanguage: 'en-BD',
+                  publisher: {
+                    '@id': `${config.siteUrl}/#organization`,
+                  },
+                  potentialAction: {
+                    '@type': 'SearchAction',
+                    target: `${config.siteUrl}/catalog?q={search_term_string}`,
+                    'query-input': 'required name=search_term_string',
+                  },
                 },
               ],
             }),

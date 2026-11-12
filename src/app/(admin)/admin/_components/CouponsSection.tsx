@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { Plus } from 'lucide-react';
 import { Coupon } from '@/types';
 import { formatPrice } from '@/config/app';
+import { CreateCouponModal } from './CreateCouponModal';
 
 interface CouponsSectionProps {
   coupons: Coupon[];
@@ -12,8 +12,10 @@ interface CouponsSectionProps {
 
 export function CouponsSection({ coupons }: CouponsSectionProps) {
   const [today, setToday] = useState('');
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setToday(new Date().toISOString().slice(0, 10));
   }, []);
 
@@ -29,13 +31,14 @@ export function CouponsSection({ coupons }: CouponsSectionProps) {
               Create and manage promotional discount codes for boutique clients.
             </p>
           </div>
-          <Link
-            href="/admin/coupons/new"
+          <button
+            type="button"
+            onClick={() => setIsCreateModalOpen(true)}
             className="inline-flex items-center justify-center gap-2 rounded-xl bg-gold-400 px-4 py-2.5 text-sm font-semibold text-noir-950 transition-colors hover:bg-gold-300"
           >
             <Plus className="h-4 w-4" />
             Create coupon
-          </Link>
+          </button>
         </div>
       </div>
 
@@ -78,6 +81,13 @@ export function CouponsSection({ coupons }: CouponsSectionProps) {
           </div>
         ))}
       </div>
+
+      {isCreateModalOpen && (
+        <CreateCouponModal
+          open={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+        />
+      )}
     </div>
   );
 }

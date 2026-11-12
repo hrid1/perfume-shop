@@ -451,7 +451,7 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 'p-12',
-    slug: 'noire-signature-discovery-set',
+    slug: 'amros-signature-discovery-set',
     name: 'Amros Signature Discovery Set',
     brand: 'Amros Coffret',
     category: 'discovery-sets',
@@ -791,7 +791,7 @@ export const COUPONS: Coupon[] = [
   },
   {
     id: 'c-2',
-    code: 'NOIRE500',
+    code: 'AMROS500',
     type: 'fixed',
     value: 500,
     minOrder: 3000,

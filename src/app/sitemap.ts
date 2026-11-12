@@ -4,15 +4,30 @@ import { JOURNAL_POSTS } from '@/data/journalPosts';
 import { PRODUCTS } from '@/data/mockData';
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  const now = new Date();
+
   const staticPages: MetadataRoute.Sitemap = [
-    { url: config.siteUrl, changeFrequency: 'weekly', priority: 1 },
+    {
+      url: config.siteUrl,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 1,
+    },
     {
       url: `${config.siteUrl}/catalog`,
+      lastModified: now,
       changeFrequency: 'daily',
       priority: 0.9,
     },
     {
+      url: `${config.siteUrl}/quiz`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
       url: `${config.siteUrl}/journal`,
+      lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.7,
     },
@@ -22,12 +37,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     (product) => product.status === 'active',
   ).map((product) => ({
     url: `${config.siteUrl}/perfume/${product.slug}`,
+    lastModified: now,
     changeFrequency: 'weekly',
     priority: 0.8,
   }));
 
   const journalPages: MetadataRoute.Sitemap = JOURNAL_POSTS.map((post) => ({
     url: `${config.siteUrl}/journal/${post.slug}`,
+    lastModified: now,
     changeFrequency: 'monthly',
     priority: 0.6,
   }));

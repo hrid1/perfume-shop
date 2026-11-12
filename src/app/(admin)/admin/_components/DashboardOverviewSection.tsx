@@ -9,10 +9,19 @@ import {
   Package,
   Clock,
   ArrowRight,
+  Info,
+  AlertTriangle,
 } from 'lucide-react';
 import { formatPrice } from '@/config/app';
 
 export type OrderActionStatus = 'new' | 'action_taken';
+export type MockOrderStatus = 'processing' | 'shipped' | 'delivered' | 'cancelled';
+
+export interface MockOrderItem {
+  productName: string;
+  size: string;
+  quantity: number;
+}
 
 export interface MockOrder {
   id: string;
@@ -21,10 +30,12 @@ export interface MockOrder {
   phone: string;
   location: string;
   itemsSummary: string;
+  items: MockOrderItem[];
   total: number;
   paymentMethod: string;
-  status: 'processing' | 'shipped' | 'delivered';
+  status: MockOrderStatus;
   actionStatus?: OrderActionStatus;
+  cancellationReason?: string;
   date: string;
 }
 
@@ -38,8 +49,9 @@ export function DashboardOverviewSection({
   salesData,
 }: DashboardOverviewSectionProps) {
   const pendingOrdersCount = orders.filter(
-    (o) => (o.actionStatus || 'new') === 'new' || o.status === 'processing'
+    (o) => o.status !== 'cancelled' && ((o.actionStatus || 'new') === 'new' || o.status === 'processing')
   ).length;
+
   return (
     <div className="animate-fade-in">
       {/* Header */}
@@ -182,19 +194,52 @@ export function DashboardOverviewSection({
                   <p className="font-semibold text-sm text-cream-50 tracking-tight">
                     {order.orderNumber}
                   </p>
-                  {(order.actionStatus || 'new') === 'new' && (
+                  {order.status === 'cancelled' ? (
+                    <div className="inline-flex items-center gap-1">
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-rose-500/15 border border-rose-500/30 text-rose-300">
+                        Cancelled
+                      </span>
+                      {order.cancellationReason && (
+                        <div className="relative inline-flex items-center group">
+                          <button
+                            type="button"
+                            title={`Reason: ${order.cancellationReason}`}
+                            className="p-0.5 rounded-full text-rose-400/90 hover:text-rose-200 hover:bg-rose-500/20 transition-all focus:outline-none cursor-pointer"
+                            aria-label="View cancellation reason"
+                          >
+                            <Info className="w-3 h-3" />
+                          </button>
+                          <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 hidden group-hover:flex flex-col z-50 w-56 p-2.5 rounded-lg bg-noir-900 border border-rose-500/30 shadow-2xl shadow-black/90 pointer-events-none">
+                            <div className="flex items-center gap-1 text-[10px] font-semibold text-rose-400 mb-0.5">
+                              <AlertTriangle className="w-3 h-3 text-rose-400 shrink-0" />
+                              <span>Reason</span>
+                            </div>
+                            <p className="text-[11px] text-noir-200 font-normal leading-relaxed">
+                              {order.cancellationReason}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : (order.actionStatus || 'new') === 'new' ? (
                     <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-rose-500/15 border border-rose-500/30 text-rose-300">
                       <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
                       New
                     </span>
-                  )}
+                  ) : null}
                 </div>
                 <p className="text-xs text-noir-400 mt-0.5">
                   {order.customerName}
                 </p>
               </div>
               <div className="text-right">
-                <span className="font-serif font-bold text-base text-gold-300">
+                <span
+                  className={`font-serif font-bold text-base ${
+                    order.status === 'cancelled'
+                      ? 'line-through text-noir-500'
+                      : 'text-gold-300'
+                  }`}
+                >
                   {formatPrice(order.total)}
                 </span>
               </div>

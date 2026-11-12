@@ -7,3 +7,5 @@ export { TrendingSection } from './TrendingSection';
 export { GiftsSection } from './GiftsSection';
 export { ReviewsSection } from './ReviewsSection';
 export { JournalSection } from './JournalSection';
+export { ExclusivePrivilegesSection } from './ExclusivePrivilegesSection';
+export { HomepageWhatsAppButton } from './HomepageWhatsAppButton';

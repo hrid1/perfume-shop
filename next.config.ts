@@ -44,8 +44,7 @@ const nextConfig: NextConfig = {
       { source: '/search', destination: '/catalog' },
       { source: '/wishlist', destination: '/catalog?filter=wishlist' },
       { source: '/cart', destination: '/checkout' },
-      { source: '/account', destination: '/admin' },
-      { source: '/login', destination: '/admin' },
+      { source: '/login', destination: '/account' },
       { source: '/products', destination: '/catalog' },
     ];
   },

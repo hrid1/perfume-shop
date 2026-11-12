@@ -38,9 +38,10 @@ const navLinks = [
   { label: 'Attar', to: '/catalog?category=attar' },
   { label: 'Wax', to: '/catalog?category=wax' },
   { label: 'Body Mist', to: '/catalog?category=body-mist' },
+  { label: 'Dkan Perfum', to: '/catalog?category=dkan-perfum' },
   // { label: 'Discovery Sets', to: '/catalog?category=discovery-sets' },
-  { label: 'New Arrivals', to: '/catalog?filter=new' },
-  { label: 'Best Sellers', to: '/catalog?filter=bestseller' },
+  // { label: 'New Arrivals', to: '/catalog?filter=new' },
+  // { label: 'Best Sellers', to: '/catalog?filter=bestseller' },
 ];
 
 export function Navbar() {
@@ -216,7 +217,7 @@ export function Navbar() {
                 {totalItems > 0 && <CountBadge count={totalItems} />}
               </button>
               <Link
-                to={isAuthenticated ? '/account' : '/login'}
+                to="/account"
                 className="p-2 text-cream-100 hover:text-gold-400 transition-colors"
                 aria-label="Account"
               >
@@ -379,7 +380,7 @@ export function Navbar() {
               <ChevronRight className="w-4 h-4 text-muted" />
             </Link>
             <Link
-              to={isAuthenticated ? '/account' : '/login'}
+              to="/account"
               onClick={() => setMenuOpen(false)}
               className="flex items-center justify-between py-3 px-3 rounded-lg hover:bg-noir-900 text-cream-200 hover:text-gold-400 transition-colors"
             >

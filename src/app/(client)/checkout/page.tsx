@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { BANGLADESH_DIVISIONS } from '@/data/mockData';
-import { PaymentMethod } from '@/types';
+import { PaymentMethod, Order } from '@/types';
 import { useCoupons } from '@/context/CouponContext';
 import {
   CheckoutHeader,
   CheckoutEmptyState,
-  CheckoutOrderSuccess,
   CheckoutContactForm,
   CheckoutShippingAddress,
   CheckoutPaymentSelection,
@@ -16,13 +16,16 @@ import {
 } from './_components';
 
 export default function CheckoutPage() {
+  const router = useRouter();
   const {
     items,
+    selectedItems,
     subtotal,
     discount,
     couponCode,
-    clearCart,
+    completeCheckout,
     freeDeliveryThreshold,
+    openCart,
   } = useCart();
   const { markCouponUsed } = useCoupons();
 
@@ -41,7 +44,6 @@ export default function CheckoutPage() {
 
   // Order Placement State
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [placedOrderNumber, setPlacedOrderNumber] = useState<string | null>(null);
 
   const districtsForDivision = BANGLADESH_DIVISIONS[division] || [];
   const isDhakaCity = division === 'Dhaka' && district === 'Dhaka';
@@ -50,7 +52,7 @@ export default function CheckoutPage() {
   const netSubtotal = Math.max(0, subtotal - discount);
   const isFreeDelivery = netSubtotal >= freeDeliveryThreshold && netSubtotal > 0;
   const deliveryFee =
-    items.length === 0 ? 0 : isFreeDelivery ? 0 : isDhakaCity ? 60 : 120;
+    selectedItems.length === 0 ? 0 : isFreeDelivery ? 0 : isDhakaCity ? 60 : 120;
   const grandTotal = Math.max(0, netSubtotal + deliveryFee);
 
   const handleDivisionChange = (newDivision: string) => {
@@ -76,28 +78,82 @@ export default function CheckoutPage() {
 
     setIsSubmitting(true);
     setTimeout(() => {
-      const generatedOrderNumber = `NR-2025-${Math.floor(1000 + Math.random() * 9000)}`;
-      setPlacedOrderNumber(generatedOrderNumber);
+      const generatedOrderNumber = `AMR-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+
+      const completedOrder: Order = {
+        id: `ord-${Date.now()}`,
+        orderNumber: generatedOrderNumber,
+        customer: {
+          name: fullName,
+          phone,
+          email: email || undefined,
+        },
+        items: selectedItems.map((item) => ({
+          productId: item.productId,
+          name: item.name,
+          image: item.image,
+          size: item.size,
+          price: item.price,
+          quantity: item.quantity,
+        })),
+        address: {
+          fullName,
+          phone,
+          division,
+          district,
+          area: area === 'Other' && customArea ? customArea : area,
+          fullAddress,
+          instructions: notes || undefined,
+        },
+        paymentMethod,
+        paymentStatus: paymentMethod === 'cod' ? 'pending' : 'paid',
+        subtotal,
+        deliveryFee,
+        discount,
+        total: grandTotal,
+        couponCode: couponCode || undefined,
+        status: 'placed',
+        estimatedDelivery: isDhakaCity
+          ? '2–3 business days (Dhaka Express)'
+          : '3–5 business days (Nationwide)',
+        createdAt: new Date().toISOString(),
+      };
+
+      try {
+        localStorage.setItem('amros_last_order', JSON.stringify(completedOrder));
+        const existingHistory = localStorage.getItem('amros_orders_history');
+        const history: Order[] = existingHistory ? JSON.parse(existingHistory) : [];
+        localStorage.setItem(
+          'amros_orders_history',
+          JSON.stringify([completedOrder, ...history])
+        );
+      } catch (err) {
+        console.error('Failed to save order to localStorage', err);
+      }
+
       if (couponCode) markCouponUsed(couponCode);
-      clearCart();
+      completeCheckout();
       setIsSubmitting(false);
+      router.push(`/order-confirmed?orderNumber=${generatedOrderNumber}`);
     }, 1200);
   };
 
-  if (placedOrderNumber) {
-    return (
-      <CheckoutOrderSuccess
-        fullName={fullName}
-        orderNumber={placedOrderNumber}
-        paymentMethod={paymentMethod}
-        isDhakaCity={isDhakaCity}
-        grandTotal={grandTotal}
-      />
-    );
-  }
-
   if (items.length === 0) {
     return <CheckoutEmptyState />;
+  }
+
+  if (selectedItems.length === 0) {
+    return (
+      <div className="container-lux py-20 text-center max-w-md mx-auto">
+        <h2 className="font-serif text-2xl font-medium mb-2">No products selected</h2>
+        <p className="text-xs text-noir-400 mb-6">
+          Select at least one product from your scent bag to continue checkout.
+        </p>
+        <button type="button" onClick={openCart} className="btn-gold text-xs px-6 py-3">
+          Review Your Scent Bag
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -144,7 +200,7 @@ export default function CheckoutPage() {
 
         <div className="lg:col-span-5">
           <CheckoutOrderSummary
-            items={items}
+            items={selectedItems}
             subtotal={subtotal}
             discount={discount}
             couponCode={couponCode}

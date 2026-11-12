@@ -1,14 +1,17 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
+import { X } from 'lucide-react';
+import { Modal } from '@/components/Modal';
 import { Coupon } from '@/types';
 import { useCoupons } from '@/context/CouponContext';
 
-export default function NewCouponPage() {
-  const router = useRouter();
+interface CreateCouponModalProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+export function CreateCouponModal({ open, onClose }: CreateCouponModalProps) {
   const { addCoupon, isLoaded } = useCoupons();
   const [code, setCode] = useState('');
   const [type, setType] = useState<Coupon['type']>('percentage');
@@ -20,8 +23,10 @@ export default function NewCouponPage() {
   const [today, setToday] = useState('');
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setToday(new Date().toISOString().slice(0, 10));
   }, []);
+
   const inputClass =
     'mt-1 w-full rounded-lg border border-noir-700 bg-noir-950 px-3 py-2.5 text-sm text-noir-100 outline-none focus:border-gold-400';
   const labelClass = 'block text-xs font-medium text-noir-300';
@@ -80,31 +85,30 @@ export default function NewCouponPage() {
     };
 
     const result = addCoupon(coupon);
-    if (result.success) router.push('/admin/coupons');
+    if (result.success) onClose();
     else setFormError(result.message);
   };
 
   return (
-    <div className="mx-auto max-w-4xl p-6 md:p-10">
-      <Link
-        href="/admin/coupons"
-        className="mb-6 inline-flex items-center gap-2 text-sm text-noir-400 transition-colors hover:text-gold-300"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back to coupons
-      </Link>
-
-      <div className="mb-6">
-        <h1 className="font-serif text-3xl font-normal text-cream-50">Create coupon</h1>
-        <p className="mt-1 text-sm text-noir-400">
-          Set the discount, minimum order, expiry date, and usage limit.
-        </p>
+    <Modal open={open} onClose={onClose} className="max-h-[90vh] max-w-2xl overflow-y-auto">
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <div>
+          <h2 className="font-serif text-2xl text-cream-50">Create coupon</h2>
+          <p className="mt-1 text-sm text-noir-400">
+            Set the discount, minimum order, expiry date, and usage limit.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close create coupon"
+          className="rounded-full p-1.5 text-noir-400 transition-colors hover:bg-noir-800 hover:text-cream-50"
+        >
+          <X className="h-4 w-4" />
+        </button>
       </div>
 
-      <form
-        onSubmit={handleSubmit}
-        className="rounded-2xl border border-noir-800 bg-noir-900/80 p-5 text-cream-50 shadow-lg sm:p-8"
-      >
+      <form onSubmit={handleSubmit}>
         <div className="grid gap-5 sm:grid-cols-2">
           <label className={labelClass}>
             Coupon code *
@@ -185,12 +189,13 @@ export default function NewCouponPage() {
         )}
 
         <div className="mt-8 flex justify-end gap-3 border-t border-noir-800 pt-5">
-          <Link
-            href="/admin/coupons"
+          <button
+            type="button"
+            onClick={onClose}
             className="rounded-xl border border-noir-700 px-4 py-2.5 text-sm text-noir-300 transition-colors hover:bg-noir-800"
           >
             Cancel
-          </Link>
+          </button>
           <button
             type="submit"
             disabled={!isLoaded}
@@ -200,6 +205,6 @@ export default function NewCouponPage() {
           </button>
         </div>
       </form>
-    </div>
+    </Modal>
   );
 }

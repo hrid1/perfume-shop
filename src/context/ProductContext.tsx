@@ -27,6 +27,7 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
         if (!Array.isArray(parsed)) {
           throw new Error('Saved product data is not a list');
         }
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setCustomProducts(parsed as Product[]);
       }
     } catch (loadError) {

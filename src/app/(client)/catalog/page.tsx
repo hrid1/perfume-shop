@@ -50,23 +50,28 @@ function CatalogContent() {
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPriceMax(maxPrice);
   }, [maxPrice]);
 
   // Sync internal state with URL query parameters
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedCategory(urlCategory);
   }, [urlCategory]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedFamily(urlFamily);
   }, [urlFamily]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedFilter(urlFilter);
   }, [urlFilter]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSearchQuery(urlSearch);
   }, [urlSearch]);
 
@@ -245,7 +250,6 @@ function CatalogContent() {
       <CatalogHeader
         badge={headerInfo.badge}
         title={headerInfo.title}
-        subtitle={headerInfo.subtitle}
         totalCreations={products.length}
         filteredCount={filteredProducts.length}
       />

@@ -8,6 +8,7 @@ import {
   OrdersManagementSection,
   CustomersSection,
   type MockOrder,
+  type MockOrderStatus,
   type OrderActionStatus,
   type CustomerItem,
 } from './';
@@ -20,6 +21,10 @@ const INITIAL_ORDERS: MockOrder[] = [
     phone: '01711234567',
     location: 'Gulshan 2, Dhaka',
     itemsSummary: 'Onyx Noir (100ml) × 1, White Musk Attar × 1',
+    items: [
+      { productName: 'Onyx Noir', size: '100ml', quantity: 1 },
+      { productName: 'White Musk Attar', size: '—', quantity: 1 },
+    ],
     total: 6960,
     paymentMethod: 'bKash',
     status: 'delivered',
@@ -33,6 +38,7 @@ const INITIAL_ORDERS: MockOrder[] = [
     phone: '01711234567',
     location: 'Banani, Dhaka',
     itemsSummary: 'Discovery Set (5×2ml) × 1',
+    items: [{ productName: 'Discovery Set', size: '5×2ml', quantity: 1 }],
     total: 3300,
     paymentMethod: 'COD',
     status: 'delivered',
@@ -46,6 +52,7 @@ const INITIAL_ORDERS: MockOrder[] = [
     phone: '01933456789',
     location: 'Chattogram',
     itemsSummary: 'Amber Oud Royale (100ml) × 1',
+    items: [{ productName: 'Amber Oud Royale', size: '100ml', quantity: 1 }],
     total: 6700,
     paymentMethod: 'Card',
     status: 'shipped',
@@ -59,6 +66,7 @@ const INITIAL_ORDERS: MockOrder[] = [
     phone: '01755123987',
     location: 'Sylhet',
     itemsSummary: 'Rose Velvet (50ml) × 1',
+    items: [{ productName: 'Rose Velvet', size: '50ml', quantity: 1 }],
     total: 4200,
     paymentMethod: 'Nagad',
     status: 'processing',
@@ -72,11 +80,27 @@ const INITIAL_ORDERS: MockOrder[] = [
     phone: '01711889900',
     location: 'Dhanmondi, Dhaka',
     itemsSummary: 'Santal Blanc (100ml) × 1',
+    items: [{ productName: 'Santal Blanc', size: '100ml', quantity: 1 }],
     total: 5800,
     paymentMethod: 'bKash',
     status: 'processing',
     actionStatus: 'new',
     date: 'Oct 17, 2025',
+  },
+  {
+    id: 'ord-106',
+    orderNumber: 'NR-2025-0839',
+    customerName: 'Kamal Uddin',
+    phone: '01819998877',
+    location: 'Mirpur 10, Dhaka',
+    itemsSummary: 'Onyx Noir (50ml) × 1',
+    items: [{ productName: 'Onyx Noir', size: '50ml', quantity: 1 }],
+    total: 4200,
+    paymentMethod: 'COD',
+    status: 'cancelled',
+    actionStatus: 'action_taken',
+    cancellationReason: 'Customer Unreachable on Phone',
+    date: 'Oct 11, 2025',
   },
 ];
 
@@ -109,16 +133,27 @@ export function AdminContent({ view }: { view: AdminView }) {
 
   const updateOrderStatus = (
     orderId: string,
-    newStatus: 'processing' | 'shipped' | 'delivered'
+    newStatus: MockOrderStatus,
+    reason?: string
   ) => {
     setOrders((prev) =>
       prev.map((o) => {
         if (o.id !== orderId) return o;
         const autoAction: OrderActionStatus =
-          (newStatus === 'shipped' || newStatus === 'delivered') && (o.actionStatus === 'new' || !o.actionStatus)
+          newStatus === 'cancelled'
+            ? 'action_taken'
+            : (newStatus === 'shipped' || newStatus === 'delivered') && (o.actionStatus === 'new' || !o.actionStatus)
             ? 'action_taken'
             : (o.actionStatus || 'new');
-        return { ...o, status: newStatus, actionStatus: autoAction };
+        return {
+          ...o,
+          status: newStatus,
+          actionStatus: autoAction,
+          cancellationReason:
+            newStatus === 'cancelled'
+              ? reason || o.cancellationReason || 'Admin Cancelled'
+              : undefined,
+        };
       })
     );
   };
@@ -177,7 +212,7 @@ export function AdminContent({ view }: { view: AdminView }) {
       )}
 
       {view === 'customers' && (
-        <CustomersSection customers={CUSTOMERS} />
+        <CustomersSection customers={CUSTOMERS} orders={orders} />
       )}
 
     </div>

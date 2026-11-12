@@ -1,7 +1,6 @@
 interface CatalogHeaderProps {
   badge: string;
   title: string;
-  subtitle: string;
   totalCreations: number;
   filteredCount: number;
 }
@@ -9,7 +8,6 @@ interface CatalogHeaderProps {
 export function CatalogHeader({
   badge,
   title,
-  subtitle,
   totalCreations,
   filteredCount,
 }: CatalogHeaderProps) {

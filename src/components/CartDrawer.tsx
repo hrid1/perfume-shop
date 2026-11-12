@@ -10,6 +10,8 @@ import { formatPrice } from '@/config/app';
 export function CartDrawer() {
   const {
     items,
+    selectedItems,
+    toggleItemSelection,
     removeItem,
     updateQuantity,
     isCartOpen,
@@ -82,7 +84,7 @@ export function CartDrawer() {
 
       {/* Drawer content - Right side slide-in with luxury easing */}
       <div
-        className={`relative w-full max-w-md bg-noir-950 border-l border-noir-800 text-noir-50 flex flex-col h-full shadow-[-10px_0_35px_rgba(0,0,0,0.85),0_0_25px_rgba(212,168,78,0.06)] z-10 transform transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        className={`relative w-full max-w-md bg-noir-950 border-l border-noir-800 text-noir-50 flex flex-col h-full shadow-[-10px_0_35px_rgba(0,0,0,0.85)] z-10 transform transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
           isCartOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
@@ -93,6 +95,9 @@ export function CartDrawer() {
             <h2 className="font-serif text-xl tracking-wide font-medium">Your Scent Bag</h2>
             <span className="text-xs px-2 py-0.5 rounded-full bg-noir-800 text-gold-400 border border-gold-400/20">
               {totalItems}
+            </span>
+            <span className="text-[10px] text-noir-500">
+              {selectedItems.length} selected
             </span>
           </div>
           <button
@@ -148,6 +153,13 @@ export function CartDrawer() {
           ) : (
             items.map((item) => (
               <div key={item.id} className="py-4 flex gap-4 first:pt-0">
+                <input
+                  type="checkbox"
+                  checked={selectedItems.some((selectedItem) => selectedItem.id === item.id)}
+                  onChange={(event) => toggleItemSelection(item.id, event.target.checked)}
+                  aria-label={`Select ${item.name} for checkout`}
+                  className="mt-1 h-4 w-4 shrink-0 accent-gold-400 cursor-pointer"
+                />
                 <div className="relative w-20 h-24 rounded bg-noir-900 border border-noir-800 overflow-hidden shrink-0">
                   <Image
                     src={item.image}
@@ -268,10 +280,20 @@ export function CartDrawer() {
             {/* CTA Button */}
             <Link
               href="/checkout"
-              onClick={closeCart}
-              className="w-full btn-gold py-3 text-center flex items-center justify-center gap-2 mt-2 group"
+              onClick={(event) => {
+                if (selectedItems.length === 0) {
+                  event.preventDefault();
+                  return;
+                }
+                closeCart();
+              }}
+              aria-disabled={selectedItems.length === 0}
+              tabIndex={selectedItems.length === 0 ? -1 : undefined}
+              className={`w-full btn-gold py-3 text-center flex items-center justify-center gap-2 mt-2 group ${
+                selectedItems.length === 0 ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             >
-              <span>Proceed to Checkout</span>
+              <span>{selectedItems.length === 0 ? 'Select products to continue' : 'Proceed to Checkout'}</span>
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>

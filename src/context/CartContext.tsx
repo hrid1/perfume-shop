@@ -8,10 +8,13 @@ import { useCoupons } from './CouponContext';
 
 interface CartContextType {
   items: CartItem[];
+  selectedItems: CartItem[];
+  toggleItemSelection: (itemId: string, selected: boolean) => void;
   addItem: (product: Product, variant: ProductVariant, quantity?: number) => void;
   removeItem: (itemId: string) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
+  completeCheckout: () => void;
   couponCode: string | null;
   discount: number;
   applyCoupon: (code: string) => { success: boolean; message: string };
@@ -31,10 +34,12 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const CART_STORAGE_KEY = 'noire_perfumes_cart_v1';
+const CART_SELECTION_STORAGE_KEY = 'noire_perfumes_cart_selection_v1';
 const COUPON_STORAGE_KEY = 'noire_perfumes_coupon_v1';
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
   const [couponCode, setCouponCode] = useState<string | null>(null);
   const [discount, setDiscount] = useState<number>(0);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -44,11 +49,25 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Load from LocalStorage
   useEffect(() => {
+    let loadedItems: CartItem[] = [];
     try {
       const savedItems = localStorage.getItem(CART_STORAGE_KEY);
       if (savedItems) {
+        loadedItems = JSON.parse(savedItems);
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        setItems(JSON.parse(savedItems));
+        setItems(loadedItems);
+      }
+      setSelectedItemIds(loadedItems.map((item) => item.id));
+
+      const savedSelection = localStorage.getItem(CART_SELECTION_STORAGE_KEY);
+      if (savedSelection) {
+        const parsedSelection: unknown = JSON.parse(savedSelection);
+        if (!Array.isArray(parsedSelection) || parsedSelection.some((id) => typeof id !== 'string')) {
+          throw new Error('Saved cart selection is invalid');
+        }
+        setSelectedItemIds(
+          parsedSelection.filter((id: string) => loadedItems.some((item) => item.id === id))
+        );
       }
       const savedCoupon = localStorage.getItem(COUPON_STORAGE_KEY);
       if (savedCoupon) {
@@ -76,6 +95,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!isLoaded) return;
     try {
+      localStorage.setItem(CART_SELECTION_STORAGE_KEY, JSON.stringify(selectedItemIds));
+    } catch (e) {
+      console.error('Failed to save cart selection', e);
+    }
+  }, [selectedItemIds, isLoaded]);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    try {
       if (couponCode) {
         localStorage.setItem(COUPON_STORAGE_KEY, JSON.stringify({ code: couponCode, discount }));
       } else {
@@ -97,6 +125,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const updated = [...items];
       updated[existingIndex].quantity += quantity;
       setItems(updated);
+      const existingItemId = updated[existingIndex].id;
+      setSelectedItemIds((prev) =>
+        prev.includes(existingItemId) ? prev : [...prev, existingItemId]
+      );
     } else {
       const newItem: CartItem = {
         id: `${product.id}-${variant.id}-${Date.now()}`,
@@ -111,6 +143,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         quantity,
       };
       setItems((prev) => [...prev, newItem]);
+      setSelectedItemIds((prev) => [...prev, newItem.id]);
     }
 
     success(`Added ${product.name} (${variant.size}) to your bag`);
@@ -120,6 +153,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const removeItem = (itemId: string) => {
     const item = items.find((i) => i.id === itemId);
     setItems((prev) => prev.filter((i) => i.id !== itemId));
+    setSelectedItemIds((prev) => prev.filter((id) => id !== itemId));
     if (item) {
       success(`Removed ${item.name} from bag`);
     }
@@ -137,13 +171,48 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clearCart = () => {
     setItems([]);
+    setSelectedItemIds([]);
     setCouponCode(null);
     setDiscount(0);
   };
 
+  const completeCheckout = () => {
+    const remainingItems = items.filter((item) => !selectedItemIds.includes(item.id));
+    setItems(remainingItems);
+    setSelectedItemIds(remainingItems.map((item) => item.id));
+    setCouponCode(null);
+    setDiscount(0);
+  };
+
+  const toggleItemSelection = (itemId: string, selected: boolean) => {
+    setSelectedItemIds((prev) => {
+      if (selected) {
+        return prev.includes(itemId) ? prev : [...prev, itemId];
+      }
+      return prev.filter((id) => id !== itemId);
+    });
+  };
+
+  const selectedItems = items.filter((item) => selectedItemIds.includes(item.id));
+  const subtotal = selectedItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const appliedCoupon = coupons.find((coupon) => coupon.code === couponCode);
+  const effectiveDiscount = appliedCoupon
+    ? subtotal < appliedCoupon.minOrder
+      ? 0
+      : appliedCoupon.type === 'percentage'
+        ? Math.round((subtotal * appliedCoupon.value) / 100)
+        : appliedCoupon.value
+    : discount;
+
   const applyCoupon = (code: string) => {
     const cleanCode = code.trim().toUpperCase();
     const found = coupons.find((c) => c.code === cleanCode && c.active);
+
+    if (selectedItems.length === 0) {
+      const message = 'Select at least one product before applying a promo code';
+      error(message);
+      return { success: false, message };
+    }
 
     if (!found) {
       error('Invalid promo code');
@@ -186,13 +255,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
-  const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const selectedTotalItems = selectedItems.reduce((acc, item) => acc + item.quantity, 0);
 
   // Free delivery logic: if (subtotal - discount) >= 3000 -> 0, otherwise default inside Dhaka ৳60
   const freeDeliveryThreshold = config.delivery.freeDeliveryThreshold;
-  const netSubtotal = Math.max(0, subtotal - discount);
+  const netSubtotal = Math.max(0, subtotal - effectiveDiscount);
   const isFreeDelivery = netSubtotal >= freeDeliveryThreshold && netSubtotal > 0;
-  const deliveryFee = totalItems === 0 ? 0 : isFreeDelivery ? 0 : config.delivery.insideDhaka;
+  const deliveryFee = selectedTotalItems === 0 ? 0 : isFreeDelivery ? 0 : config.delivery.insideDhaka;
   const total = Math.max(0, netSubtotal + deliveryFee);
   const amountNeededForFreeDelivery = Math.max(0, freeDeliveryThreshold - netSubtotal);
 
@@ -200,12 +269,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
     <CartContext.Provider
       value={{
         items,
+        selectedItems,
+        toggleItemSelection,
         addItem,
         removeItem,
         updateQuantity,
         clearCart,
+        completeCheckout,
         couponCode,
-        discount,
+        discount: effectiveDiscount,
         applyCoupon,
         removeCoupon,
         isCartOpen,

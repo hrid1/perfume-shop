@@ -1,53 +1,11 @@
-'use client';
-
-import React, { useState } from 'react';
 import Link from 'next/link';
-import { Send, Sparkles, MapPin, Phone, Mail, Globe, MessageCircle } from 'lucide-react';
-import { useToast } from '@/context/ToastContext';
+import { Sparkles, MapPin, Phone, Mail } from 'lucide-react';
 import { config } from '@/config/app';
 
 export function Footer() {
-  const [email, setEmail] = useState('');
-  const { success } = useToast();
-
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-    success('Welcome to the Amros Perfumes community. Your private invitation code has been sent.');
-    setEmail('');
-  };
-
   return (
     <footer className="bg-noir-950 border-t border-noir-800 text-noir-300 pt-16 pb-12">
       <div className="container-lux">
-        {/* Newsletter Section */}
-        <div className="bg-gradient-to-r from-noir-900 via-noir-900/80 to-noir-900 border border-noir-800 rounded-2xl p-8 md:p-12 mb-16 text-center max-w-4xl mx-auto shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-gold-500/5 rounded-full blur-3xl -z-10 pointer-events-none" />
-          <span className="text-[11px] uppercase tracking-[0.2em] text-gold-400 font-semibold mb-3 block">
-            Exclusive Privileges
-          </span>
-          <h3 className="font-serif text-3xl md:text-4xl text-noir-50 font-medium mb-3">
-            Join the Amros Perfumes Circle
-          </h3>
-          <p className="text-sm text-noir-400 max-w-md mx-auto mb-6">
-            Subscribe to receive private allocations, new batch releases, and 10% off your first order.
-          </p>
-          <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-2 max-w-md mx-auto">
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email address..."
-              className="flex-1 bg-noir-950/90 border border-noir-700 px-4 py-3 text-sm rounded-full text-noir-100 placeholder:text-noir-500 focus:outline-none focus:border-gold-400"
-            />
-            <button type="submit" className="btn-gold py-3 px-6 whitespace-nowrap">
-              <span>Subscribe</span>
-              <Send className="w-3.5 h-3.5" />
-            </button>
-          </form>
-        </div>
-
         {/* 4-Column Links Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-16">
           {/* Brand Info */}
@@ -56,7 +14,7 @@ export function Footer() {
               AMROS<span className="text-gold-400"> PERFUMES</span>
             </Link>
             <p className="text-xs text-noir-400 leading-relaxed mb-4">
-              Artisanal French & Oriental haute perfumery blended with exceptional maceration protocols. Crafted in limited batches for discerning connoisseurs.
+              Amros Perfumes is a premium fragrance house in Bangladesh, crafting long-lasting luxury perfumes, pure attar oils, and inspired scents designed for unforgettable impressions.
             </p>
             <div className="flex items-center gap-3 text-noir-400">
               <a
@@ -92,12 +50,12 @@ export function Footer() {
             <ul className="space-y-2.5 text-xs text-noir-400">
               <li>
                 <Link href="/catalog?category=men" className="hover:text-gold-300 transition-colors">
-                  Men's Fragrances
+                  Men&apos;s Fragrances
                 </Link>
               </li>
               <li>
                 <Link href="/catalog?category=women" className="hover:text-gold-300 transition-colors">
-                  Women's Fragrances
+                  Women&apos;s Fragrances
                 </Link>
               </li>
               <li>

@@ -9,21 +9,39 @@ import {
   GiftsSection,
   ReviewsSection,
   JournalSection,
+  ExclusivePrivilegesSection,
+  HomepageWhatsAppButton,
 } from './_components';
 
 export const metadata: Metadata = {
-  title: 'Buy Perfumes Online in Bangladesh',
+  title: {
+    absolute: 'Amros Perfumes | Premium Long-Lasting Perfumes in Bangladesh',
+  },
   description:
-    'Discover men’s, women’s and unisex perfumes, attars, and fragrance discovery sets at Amros Perfumes, your online perfume store in Bangladesh.',
+    'Official website of Amros Perfumes. Shop premium long-lasting perfumes, luxury inspired fragrances, pure attars, and discovery sets online in Bangladesh with cash on delivery.',
+  keywords: [
+    'amros perfume',
+    'amros perfumes',
+    'amros',
+    'amros bd',
+    'amros perfume bangladesh',
+    'amros perfume barisal',
+    'amros perfume price in bangladesh',
+    'buy perfume online bangladesh',
+    'long lasting perfume bangladesh',
+    'attar bangladesh',
+    'perfume shop bangladesh',
+  ],
   alternates: {
     canonical: '/',
   },
   openGraph: {
     type: 'website',
-    title: 'Buy Perfumes Online in Bangladesh',
+    siteName: 'Amros Perfumes',
+    title: 'Amros Perfumes | Premium Long-Lasting Perfumes in Bangladesh',
     description:
-      'Discover men’s, women’s and unisex perfumes, attars, and fragrance discovery sets at Amros Perfumes.',
-    url: '/',
+      'Official website of Amros Perfumes. Shop premium long-lasting perfumes, luxury inspired fragrances, and pure attars online in Bangladesh.',
+    url: 'https://www.amrosperfumes.com',
   },
 };
 
@@ -39,6 +57,8 @@ export default function HomePage() {
       <GiftsSection />
       <ReviewsSection />
       <JournalSection />
+      <ExclusivePrivilegesSection />
+      <HomepageWhatsAppButton />
     </div>
   );
 }

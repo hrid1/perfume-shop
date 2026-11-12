@@ -5,11 +5,18 @@ import type { Metadata } from 'next';
 import { JOURNAL_POSTS } from '@/data/journalPosts';
 
 export const metadata: Metadata = {
-  title: 'Fragrance Guides & Perfume Journal',
+  title: 'Fragrance Guides & Perfume Journal | Amros Perfumes',
   description:
-    'Read fragrance guides, perfume tips, and stories about attars, oud, and choosing scents for Bangladesh’s climate from Amros Perfumes.',
+    'Read fragrance guides, perfume tips, and scent stories from Amros Perfumes, your luxury fragrance house in Bangladesh.',
   alternates: {
     canonical: '/journal',
+  },
+  openGraph: {
+    type: 'website',
+    title: 'Fragrance Guides & Perfume Journal | Amros Perfumes',
+    description:
+      'Read fragrance guides, perfume tips, and scent stories from Amros Perfumes.',
+    url: '/journal',
   },
 };
 

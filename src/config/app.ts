@@ -1,8 +1,8 @@
 export const config = {
   brand: {
     name: 'Amros Perfumes',
-    tagline: 'Sensory Elegance Bottled in Darkness.',
-    description: 'Artisanal haute perfumery crafted with pure extracts and timeless allure.',
+    tagline: 'Premium Long-Lasting Fragrances for Everyday Luxury.',
+    description: 'Amros Perfumes is a premium fragrance house in Bangladesh, crafting long-lasting luxury perfumes, pure attar oils, and inspired scents.',
   },
   siteUrl: 'https://www.amrosperfumes.com',
   delivery: {
@@ -20,7 +20,7 @@ export const config = {
     address: 'Gulshan 2, Dhaka 1212, Bangladesh',
   },
   social: {
-    instagram: 'https://instagram.com/amrosperfumes',
+    instagram: 'https://instagram.com/amrosbd',
     facebook: 'https://facebook.com/amrosperfumes',
   },
 };

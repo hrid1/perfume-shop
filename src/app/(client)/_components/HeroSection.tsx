@@ -10,7 +10,7 @@ export function HeroSection() {
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
         <Image
           src="https://images.pexels.com/photos/7850600/pexels-photo-7850600.jpeg?auto=compress&cs=tinysrgb&w=1600"
-          alt="Find Your Signature"
+          alt="Amros Perfumes Bangladesh - Luxury Fragrances & Attars"
           fill
           priority
           sizes="100vw"
@@ -26,26 +26,33 @@ export function HeroSection() {
 
         {/* Eyebrow — delay 0.1s */}
         <p
-          className="hero-fade-in text-xs sm:text-sm font-medium tracking-[0.35em] uppercase text-gold-400 mb-5"
+          className="hero-fade-in text-xs sm:text-sm font-medium tracking-[0.35em] uppercase text-gold-400 mb-4"
           style={{ animationDelay: '0.1s' }}
         >
-          Premium Fragrance
+          Amros Perfumes Bangladesh
         </p>
 
         {/* Headline — delay 0.2s */}
         <h1
-          className="hero-fade-up font-serif text-5xl sm:text-7xl md:text-8xl lg:text-[5.5rem] font-semibold tracking-tight text-white leading-[1.06] mb-5"
+          className="hero-fade-up font-serif text-5xl sm:text-7xl md:text-8xl lg:text-[5.5rem] font-semibold tracking-tight text-white leading-[1.06] mb-3"
           style={{ animationDelay: '0.2s' }}
         >
-          Find Your Signature.
+          Amros Perfumes
         </h1>
 
-        {/* Subtitle — delay 0.4s */}
+        {/* Tagline & Subtitle — delay 0.3s & 0.4s */}
+        <p
+          className="hero-fade-up font-serif text-xl sm:text-2xl md:text-3xl text-gold-300 font-normal mb-4"
+          style={{ animationDelay: '0.3s' }}
+        >
+          Find Your Signature Scent.
+        </p>
+
         <p
           className="hero-fade-up text-base sm:text-lg md:text-xl text-neutral-300 font-light max-w-xl mx-auto mb-10 leading-relaxed"
           style={{ animationDelay: '0.4s' }}
         >
-          Fragrances crafted to become part of your identity.
+          Premium long-lasting perfumes, pure attar oils, and inspired luxury fragrances crafted to leave a lasting impression across Bangladesh.
         </p>
 
         {/* CTAs — delay 0.6s */}

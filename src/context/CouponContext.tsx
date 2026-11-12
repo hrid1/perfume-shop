@@ -28,6 +28,7 @@ export function CouponProvider({ children }: { children: React.ReactNode }) {
         if (!Array.isArray(parsed)) {
           throw new Error('Saved coupon data is not a list');
         }
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setCustomCoupons(parsed as Coupon[]);
       }
     } catch (loadError) {
