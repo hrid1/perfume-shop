@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
+import { useOverlay } from '@/hooks/useOverlay';
 
 export interface DrawerProps {
   open: boolean;
@@ -9,6 +10,8 @@ export interface DrawerProps {
   side?: 'left' | 'right';
   width?: string;
   className?: string;
+  /** Accessible name announced by screen readers. */
+  ariaLabel?: string;
 }
 
 export function Drawer({
@@ -18,17 +21,9 @@ export function Drawer({
   side = 'left',
   width = '320px',
   className = '',
+  ariaLabel,
 }: DrawerProps) {
-  useEffect(() => {
-    if (open) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [open]);
+  useOverlay(open, onClose);
 
   if (!open) return null;
 
@@ -43,6 +38,9 @@ export function Drawer({
 
       {/* Drawer Panel */}
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={ariaLabel}
         className={`relative h-full bg-noir-950 border-r border-noir-800 text-cream-50 shadow-2xl z-10 overflow-y-auto flex flex-col ${
           side === 'left' ? 'mr-auto' : 'ml-auto border-l border-r-0'
         } ${className}`}
@@ -59,19 +57,26 @@ export interface ModalProps {
   onClose: () => void;
   children: React.ReactNode;
   className?: string;
+  /** Accessible name announced by screen readers. */
+  ariaLabel?: string;
+  /** "danger" uses a red border and darker panel for destructive confirmations. */
+  tone?: 'default' | 'danger';
 }
 
-export function Modal({ open, onClose, children, className = '' }: ModalProps) {
-  useEffect(() => {
-    if (open) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [open]);
+const MODAL_TONES = {
+  default: 'bg-noir-900 border-noir-700',
+  danger: 'bg-noir-950 border-rose-500/30',
+};
+
+export function Modal({
+  open,
+  onClose,
+  children,
+  className = '',
+  ariaLabel,
+  tone = 'default',
+}: ModalProps) {
+  useOverlay(open, onClose);
 
   if (!open) return null;
 
@@ -83,7 +88,10 @@ export function Modal({ open, onClose, children, className = '' }: ModalProps) {
         aria-hidden="true"
       />
       <div
-        className={`relative z-10 w-full max-w-lg bg-noir-900 border border-noir-700 rounded-2xl shadow-2xl p-6 ${className}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label={ariaLabel}
+        className={`relative z-10 w-full max-w-lg border rounded-2xl shadow-2xl p-6 ${MODAL_TONES[tone]} ${className}`}
       >
         {children}
       </div>

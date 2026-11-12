@@ -53,6 +53,8 @@ export function ProductGallery({
 
         <button
           onClick={onToggleFavorite}
+          aria-label={isFavorited ? 'Remove from wishlist' : 'Add to wishlist'}
+          aria-pressed={isFavorited}
           className={`absolute top-4 right-4 p-2.5 rounded-full backdrop-blur-md transition-all duration-200 cursor-pointer ${
             isFavorited
               ? 'bg-gold-400 text-noir-950 shadow-lg scale-110'

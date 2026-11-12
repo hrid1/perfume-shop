@@ -9,6 +9,7 @@ import { useWishlist } from '@/context/WishlistContext';
 import { useCart } from '@/context/CartContext';
 import { formatPrice } from '@/config/app';
 import { useProducts } from '@/context/ProductContext';
+import { getEffectivePrice } from '@/lib/pricing';
 
 interface WishlistCardProps {
   item: WishlistItem;
@@ -139,7 +140,7 @@ export function WishlistCard({ item }: WishlistCardProps) {
           {/* Price */}
           <div className="flex items-baseline gap-2 mb-4">
             <span className="text-base md:text-lg font-bold text-noir-50">
-              {formatPrice(item.discountPrice || item.price)}
+              {formatPrice(getEffectivePrice(item))}
             </span>
             {item.discountPrice && item.discountPrice < item.price && (
               <span className="text-xs text-noir-500 line-through">

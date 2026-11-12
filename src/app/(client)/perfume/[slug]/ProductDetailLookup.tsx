@@ -1,8 +1,9 @@
 'use client';
 
-import Link from 'next/link';
 import { ProductDetailClient } from './ProductDetailClient';
 import { useProducts } from '@/context/ProductContext';
+import { SearchX } from 'lucide-react';
+import { ButtonLink, EmptyState, PageLoader } from '@/components/ui';
 
 export function ProductDetailLookup({ slug }: { slug: string }) {
   const { products, isLoaded } = useProducts();
@@ -10,18 +11,15 @@ export function ProductDetailLookup({ slug }: { slug: string }) {
 
   if (product) return <ProductDetailClient product={product} />;
 
+  if (!isLoaded) return <PageLoader message="Loading fragrance details..." />;
+
   return (
-    <div className="container-lux py-20 text-center">
-      {isLoaded ? (
-        <>
-          <h1 className="font-serif text-3xl text-cream-50">Fragrance not found</h1>
-          <Link href="/catalog" className="mt-4 inline-block text-sm text-gold-300 hover:text-gold-200">
-            Browse the collection
-          </Link>
-        </>
-      ) : (
-        <p className="text-noir-400">Loading fragrance details...</p>
-      )}
-    </div>
+    <EmptyState
+      className="container-lux py-20"
+      icon={SearchX}
+      title="Fragrance not found"
+      description="This fragrance may have been removed or the link is incorrect."
+      actions={<ButtonLink href="/catalog">Browse the collection</ButtonLink>}
+    />
   );
 }

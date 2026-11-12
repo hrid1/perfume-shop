@@ -5,6 +5,8 @@ import Image from 'next/image';
 import { Truck, ArrowRight } from 'lucide-react';
 import { formatPrice } from '@/config/app';
 import { CartItem } from '@/types';
+import { OrderTotals } from '@/components/order';
+import { CheckoutCouponField } from './CheckoutCouponField';
 
 interface CheckoutOrderSummaryProps {
   items: CartItem[];
@@ -57,35 +59,21 @@ export function CheckoutOrderSummary({
         ))}
       </div>
 
-      {/* Calculations */}
-      <div className="pt-4 border-t border-noir-800 space-y-2 text-xs">
-        <div className="flex justify-between text-noir-300">
-          <span>Subtotal</span>
-          <span className="font-mono text-noir-100">{formatPrice(subtotal)}</span>
-        </div>
-        {couponCode && (
-          <div className="flex justify-between text-gold-400">
-            <span>Promo ({couponCode})</span>
-            <span className="font-mono">-{formatPrice(discount)}</span>
-          </div>
-        )}
-        <div className="flex justify-between text-noir-300">
-          <span>Shipping Fee</span>
-          <span className="font-mono text-noir-100">
-            {deliveryFee === 0 ? (
-              <span className="text-gold-400 font-medium">Free Delivery</span>
-            ) : (
-              formatPrice(deliveryFee)
-            )}
-          </span>
-        </div>
-        <div className="flex justify-between text-base font-medium text-noir-50 pt-3 border-t border-noir-800">
-          <span className="font-serif text-lg">Total Amount</span>
-          <span className="font-mono text-lg text-gold-300 font-bold">
-            {formatPrice(grandTotal)}
-          </span>
-        </div>
+      <div className="pt-4 border-t border-noir-800">
+        <CheckoutCouponField />
       </div>
+
+      <OrderTotals
+        className="pt-4 border-t border-noir-800"
+        size="lg"
+        subtotal={subtotal}
+        discount={discount}
+        couponCode={couponCode}
+        deliveryFee={deliveryFee}
+        total={grandTotal}
+        deliveryLabel="Shipping Fee"
+        totalLabel="Total Amount"
+      />
 
       {/* Submit CTA */}
       <button

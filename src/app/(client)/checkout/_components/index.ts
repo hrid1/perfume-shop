@@ -5,3 +5,4 @@ export { CheckoutContactForm } from './CheckoutContactForm';
 export { CheckoutShippingAddress } from './CheckoutShippingAddress';
 export { CheckoutPaymentSelection } from './CheckoutPaymentSelection';
 export { CheckoutOrderSummary } from './CheckoutOrderSummary';
+export { CheckoutCouponField } from './CheckoutCouponField';

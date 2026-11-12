@@ -3,17 +3,16 @@
 import React from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { Category, Product } from '@/types';
+import { Category } from '@/types';
+import { useProducts } from '@/context/ProductContext';
 
 interface CategoriesSectionProps {
   categories: Category[];
-  products: Product[];
 }
 
-export function CategoriesSection({
-  categories,
-  products,
-}: CategoriesSectionProps) {
+export function CategoriesSection({ categories }: CategoriesSectionProps) {
+  const { products } = useProducts();
+
   return (
     <div className="animate-fade-in">
       <div className="mb-6">

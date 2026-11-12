@@ -8,6 +8,7 @@ import { Product } from '@/types';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { formatPrice } from '@/config/app';
+import { getDiscountPercent, getEffectivePrice } from '@/lib/pricing';
 
 interface ProductCardProps {
   product: Product;
@@ -19,11 +20,9 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
   const { isInWishlist, toggleWishlist } = useWishlist();
 
   const isFavorited = isInWishlist(product.id);
-  const currentPrice = product.discountPrice || product.price;
-  const hasDiscount = Boolean(product.discountPrice && product.discountPrice < product.price);
-  const discountPercentage = hasDiscount
-    ? Math.round(((product.price - currentPrice) / product.price) * 100)
-    : 0;
+  const currentPrice = getEffectivePrice(product);
+  const discountPercentage = getDiscountPercent(product);
+  const hasDiscount = discountPercentage > 0;
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -61,6 +60,8 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
         {/* Wishlist — always visible, top-right */}
         <button
           onClick={handleToggleWishlist}
+          aria-label={isFavorited ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
+          aria-pressed={isFavorited}
           className={`absolute top-3 right-3 z-20 w-8 h-8 flex items-center justify-center rounded-full transition-all duration-200 ${
             isFavorited
               ? 'bg-gold-400 text-noir-950'

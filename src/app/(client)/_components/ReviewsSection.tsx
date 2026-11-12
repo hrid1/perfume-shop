@@ -13,6 +13,9 @@ interface ReviewItem {
   verified?: boolean;
 }
 
+// PLACEHOLDER CONTENT: these are sample testimonials, not real customers.
+// Replace them with genuine, permission-cleared reviews (or load from a reviews API)
+// before launch. Set `verified: true` only for reviews tied to a real order.
 const REVIEWS_ROW_1: ReviewItem[] = [
   {
     name: 'Arif Hossain',
@@ -21,7 +24,6 @@ const REVIEWS_ROW_1: ReviewItem[] = [
     rating: 5,
     comment:
       'Unbelievable projection and longevity. Even in the sweltering Dhaka humidity, Onyx Noir held strong past 10 hours. Truly on par with niche European perfume houses.',
-    verified: true,
   },
   {
     name: 'Nusrat Jahan',
@@ -30,7 +32,6 @@ const REVIEWS_ROW_1: ReviewItem[] = [
     rating: 5,
     comment:
       "Wore Rose Velvet to my cousin's wedding. Received compliments all evening. The packaging felt like unwrapping luxury jewelry in Paris.",
-    verified: true,
   },
   {
     name: 'Mahmud Hasan',
@@ -39,7 +40,6 @@ const REVIEWS_ROW_1: ReviewItem[] = [
     rating: 5,
     comment:
       'Ordering the discovery set first was the best decision. The ৳500 voucher on the full bottle made it incredible value. Now completely hooked on Amber Oud Royale.',
-    verified: true,
   },
   {
     name: 'Sadia Islam',
@@ -48,7 +48,6 @@ const REVIEWS_ROW_1: ReviewItem[] = [
     rating: 5,
     comment:
       'Rich, opulent, and warm without being cloying. Fast 24h delivery inside Dhaka and the Cash on Delivery option gives complete peace of mind.',
-    verified: true,
   },
   {
     name: 'Zayan Karim',
@@ -57,7 +56,6 @@ const REVIEWS_ROW_1: ReviewItem[] = [
     rating: 5,
     comment:
       'The leather and saffron combination is astonishingly refined. Leaves a hypnotic sillage during evening galas. Exceptional artisanal craftsmanship.',
-    verified: true,
   },
 ];
 
@@ -69,7 +67,6 @@ const REVIEWS_ROW_2: ReviewItem[] = [
     rating: 5,
     comment:
       'The Scent Quiz matched me with Midnight Spice and it was 100% spot-on. Cinnamon, cognac and rich tobacco. My everyday winter signature now.',
-    verified: true,
   },
   {
     name: 'Fatima Rahman',
@@ -78,7 +75,6 @@ const REVIEWS_ROW_2: ReviewItem[] = [
     rating: 5,
     comment:
       'Pure non-alcoholic perfection. Silk-smooth on the skin and clean for prayer and daily wear. Will definitely repurchase.',
-    verified: true,
   },
   {
     name: 'Mehedi Hasan',
@@ -87,7 +83,6 @@ const REVIEWS_ROW_2: ReviewItem[] = [
     rating: 5,
     comment:
       'Smells like entering a private bespoke club in London. Heavy Italian leather, cardamom, and birch smoke. A masterpiece for cold weather.',
-    verified: true,
   },
   {
     name: 'Sabrina Chowdhury',
@@ -96,7 +91,6 @@ const REVIEWS_ROW_2: ReviewItem[] = [
     rating: 5,
     comment:
       'Clean, crisp aquatic with real depth. Not synthetic at all. It feels like a cool coastal breeze meeting sun-warmed driftwood.',
-    verified: true,
   },
   {
     name: 'Asifur Rahman',
@@ -105,7 +99,6 @@ const REVIEWS_ROW_2: ReviewItem[] = [
     rating: 5,
     comment:
       'Just one tiny swipe on the pulse points and the scent easily lasts past 14 hours. The Cambodian agarwood quality is unmatched in Bangladesh.',
-    verified: true,
   },
 ];
 
@@ -158,7 +151,7 @@ export function ReviewsSection() {
             Stories from the Amros Perfumes Community
           </h2>
           <p className="text-sm text-noir-400 mt-2">
-            Real feedback from fragrance connoisseurs and collectors across Bangladesh.
+            What fragrance lovers across Bangladesh say about their signature scents.
           </p>
         </div>
       </div>

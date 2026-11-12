@@ -1,9 +1,10 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
-import { PRODUCTS } from '@/data/mockData';
+import { productsService } from '@/services';
 import { config } from '@/config/app';
 import { ProductDetailClient } from './ProductDetailClient';
 import { ProductDetailLookup } from './ProductDetailLookup';
+import { PageLoader } from '@/components/ui';
 
 // This route uses client-side context (cart, wishlist) via localStorage,
 // so it must not be prerendered at build time.
@@ -15,9 +16,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const product = PRODUCTS.find(
-    (item) => item.slug === slug && item.status === 'active',
-  );
+  const product = await productsService.getBySlug(slug);
 
   if (!product) {
     return {
@@ -47,17 +46,11 @@ interface Props {
 
 export default async function ProductDetailPage({ params }: Props) {
   const { slug } = await params;
-  const product = PRODUCTS.find(
-    (item) => item.slug === slug && item.status === 'active',
-  );
+  const product = await productsService.getBySlug(slug);
 
   return (
     <Suspense
-      fallback={
-        <div className="container-lux py-20 text-center text-noir-400 font-mono">
-          Loading fragrance details…
-        </div>
-      }
+      fallback={<PageLoader message="Loading fragrance details…" />}
     >
       {product ? (
         <>

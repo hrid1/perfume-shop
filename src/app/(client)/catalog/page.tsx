@@ -12,6 +12,9 @@ import {
   CatalogProductGrid,
   CatalogMobileDrawer,
 } from './_components';
+import { getEffectivePrice } from '@/lib/pricing';
+import { PageLoader } from '@/components/ui';
+import { matchesProductQuery } from '@/lib/search';
 
 const ALL_FAMILIES: FragranceFamily[] = [
   'Woody',
@@ -38,7 +41,7 @@ function CatalogContent() {
   const { products } = useProducts();
   const maxPrice = Math.max(
     7000,
-    ...products.map((product) => product.discountPrice || product.price)
+    ...products.map((product) => getEffectivePrice(product))
   );
 
   const [selectedCategory, setSelectedCategory] = useState<string>(urlCategory);
@@ -91,20 +94,7 @@ function CatalogContent() {
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
       // 1. Text search
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const matchesName = product.name.toLowerCase().includes(q);
-        const matchesBrand = product.brand.toLowerCase().includes(q);
-        const matchesFamily = product.fragranceFamily.toLowerCase().includes(q);
-        const matchesCategory = product.category.toLowerCase().includes(q);
-        const matchesNotes =
-          product.topNotes?.some((n) => n.toLowerCase().includes(q)) ||
-          product.baseNotes?.some((n) => n.toLowerCase().includes(q));
-
-        if (!matchesName && !matchesBrand && !matchesFamily && !matchesCategory && !matchesNotes) {
-          return false;
-        }
-      }
+      if (!matchesProductQuery(product, searchQuery)) return false;
 
       // 2. Category filter
       if (selectedCategory !== 'all') {
@@ -133,13 +123,13 @@ function CatalogContent() {
       }
 
       // 5. Price filter
-      const effectivePrice = product.discountPrice || product.price;
+      const effectivePrice = getEffectivePrice(product);
       if (effectivePrice > priceMax) return false;
 
       return true;
     }).sort((a, b) => {
-      const priceA = a.discountPrice || a.price;
-      const priceB = b.discountPrice || b.price;
+      const priceA = getEffectivePrice(a);
+      const priceB = getEffectivePrice(b);
 
       if (sortBy === 'price-low') return priceA - priceB;
       if (sortBy === 'price-high') return priceB - priceA;
@@ -302,11 +292,7 @@ function CatalogContent() {
 export default function CatalogPage() {
   return (
     <Suspense
-      fallback={
-        <div className="container-lux py-20 text-center text-noir-400">
-          Loading the Amros Perfumes collection...
-        </div>
-      }
+      fallback={<PageLoader message="Loading the Amros Perfumes collection..." />}
     >
       <CatalogContent />
     </Suspense>

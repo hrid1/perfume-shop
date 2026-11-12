@@ -1,9 +1,9 @@
 import type { MetadataRoute } from 'next';
 import { config } from '@/config/app';
 import { JOURNAL_POSTS } from '@/data/journalPosts';
-import { PRODUCTS } from '@/data/mockData';
+import { productsService } from '@/services';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
   const staticPages: MetadataRoute.Sitemap = [
@@ -33,9 +33,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  const productPages: MetadataRoute.Sitemap = PRODUCTS.filter(
-    (product) => product.status === 'active',
-  ).map((product) => ({
+  const productPages: MetadataRoute.Sitemap = (await productsService.getActive()).map((product) => ({
     url: `${config.siteUrl}/perfume/${product.slug}`,
     lastModified: now,
     changeFrequency: 'weekly',

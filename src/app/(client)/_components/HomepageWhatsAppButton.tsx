@@ -1,13 +1,11 @@
 import { MessageCircle } from 'lucide-react';
-import { config } from '@/config/app';
+import { whatsappUrl } from '@/components/ui';
 
 export function HomepageWhatsAppButton() {
-  const phoneNumber = config.contact.phone.replace(/\D/g, '');
-  const message = encodeURIComponent('Hello Amros Perfumes, I would like to know more about your fragrances.');
 
   return (
     <a
-      href={`https://wa.me/${phoneNumber}?text=${message}`}
+      href={whatsappUrl('Hello Amros Perfumes, I would like to know more about your fragrances.')}
       target="_blank"
       rel="noreferrer"
       aria-label="Message Amros Perfumes on WhatsApp"

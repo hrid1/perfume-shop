@@ -5,7 +5,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import {
   ArrowRight,
-  Check,
   ChevronDown,
   ChevronUp,
   CreditCard,
@@ -17,13 +16,9 @@ import {
 } from 'lucide-react';
 import { formatPrice } from '@/config/app';
 import type { Order } from '@/types';
-import {
-  formatOrderDate,
-  paymentMethodLabel,
-  statusMeta,
-  trackingStepIndex,
-  TRACKING_STEPS,
-} from './orderUtils';
+import { formatOrderDate, paymentMethodLabel } from '@/lib/orders';
+import { ButtonLink, Card, EmptyState } from '@/components/ui';
+import { OrderProgress, OrderStatusBadge, OrderTotals } from '@/components/order';
 
 interface AccountOrdersSectionProps {
   orders: Order[];
@@ -54,25 +49,19 @@ export function AccountOrdersSection({ orders, isLoaded }: AccountOrdersSectionP
 
   if (sortedOrders.length === 0) {
     return (
-      <div className="card-lux p-6 md:p-8 border border-noir-800 bg-noir-900/80 animate-fade-in">
-        <div className="py-16 text-center max-w-md mx-auto">
-          <div className="w-16 h-16 rounded-full bg-noir-950 border border-noir-800 flex items-center justify-center mx-auto mb-5 text-gold-400/80">
-            <ShoppingBag className="w-7 h-7 stroke-[1.5]" />
-          </div>
-          <h3 className="font-serif text-2xl text-noir-50 font-medium mb-2">No Orders Yet</h3>
-          <p className="text-sm text-noir-400 leading-relaxed mb-7">
-            Orders placed with this email will appear here. Your fragrance journey is waiting to
-            begin.
-          </p>
-          <Link
-            href="/catalog"
-            className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-gold-400 hover:bg-gold-300 text-noir-950 text-xs font-semibold uppercase tracking-wider transition-all duration-200 shadow-lg shadow-gold-500/20"
-          >
-            <span>Discover Fragrances</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
-      </div>
+      <Card className="p-6 md:p-8 animate-fade-in">
+        <EmptyState
+          icon={ShoppingBag}
+          title="No Orders Yet"
+          description="Orders placed with this email will appear here. Your fragrance journey is waiting to begin."
+          actions={
+            <ButtonLink href="/catalog" size="lg">
+              <span>Discover Fragrances</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </ButtonLink>
+          }
+        />
+      </Card>
     );
   }
 
@@ -97,15 +86,10 @@ export function AccountOrdersSection({ orders, isLoaded }: AccountOrdersSectionP
 
       {sortedOrders.map((order) => {
         const isExpanded = expandedId === order.id;
-        const meta = statusMeta(order.status);
-        const activeStep = trackingStepIndex(order.status);
         const isClosed = order.status === 'cancelled' || order.status === 'returned';
 
         return (
-          <div
-            key={order.id}
-            className="card-lux border border-noir-800 bg-noir-900/80 overflow-hidden"
-          >
+          <Card key={order.id} className="overflow-hidden">
             <div className="p-5 md:p-6">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
@@ -113,12 +97,7 @@ export function AccountOrdersSection({ orders, isLoaded }: AccountOrdersSectionP
                     <span className="font-mono text-sm font-semibold text-cream-50 tracking-wide">
                       {order.orderNumber}
                     </span>
-                    <span
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider border ${meta.className}`}
-                    >
-                      <span className={`w-1.5 h-1.5 rounded-full ${meta.dot}`} />
-                      {meta.label}
-                    </span>
+<OrderStatusBadge status={order.status} />
                   </div>
                   <p className="text-xs text-noir-500 mt-1.5">
                     Placed {formatOrderDate(order.createdAt)} · {order.items.length}{' '}
@@ -193,35 +172,7 @@ export function AccountOrdersSection({ orders, isLoaded }: AccountOrdersSectionP
                     <p className="text-[10px] uppercase tracking-wider text-noir-500 mb-3">
                       Delivery Progress
                     </p>
-                    <div className="grid grid-cols-4 gap-2">
-                      {TRACKING_STEPS.map((step, index) => {
-                        const isComplete = index <= activeStep;
-                        return (
-                          <div key={step} className="text-center">
-                            <div
-                              className={`w-8 h-8 rounded-full mx-auto mb-1.5 flex items-center justify-center border ${
-                                isComplete
-                                  ? 'bg-gold-400/20 border-gold-400/40 text-gold-300'
-                                  : 'bg-noir-900 border-noir-700 text-noir-500'
-                              }`}
-                            >
-                              {isComplete ? (
-                                <Check className="w-4 h-4" />
-                              ) : (
-                                <span className="text-[10px] font-mono">{index + 1}</span>
-                              )}
-                            </div>
-                            <p
-                              className={`text-[10px] ${
-                                isComplete ? 'text-cream-100' : 'text-noir-500'
-                              }`}
-                            >
-                              {step}
-                            </p>
-                          </div>
-                        );
-                      })}
-                    </div>
+                    <OrderProgress status={order.status} />
                     {order.estimatedDelivery && (
                       <p className="text-[11px] text-noir-400 mt-3 flex items-center gap-1.5">
                         <Truck className="w-3.5 h-3.5 text-gold-400" />
@@ -305,53 +256,31 @@ export function AccountOrdersSection({ orders, isLoaded }: AccountOrdersSectionP
                   </div>
                 </div>
 
-                <div className="rounded-xl bg-noir-900 border border-noir-800 p-4 space-y-1.5 text-xs">
-                  <div className="flex justify-between text-noir-400">
-                    <span>Subtotal</span>
-                    <span className="font-mono text-noir-200">{formatPrice(order.subtotal)}</span>
-                  </div>
-                  {order.discount > 0 && (
-                    <div className="flex justify-between text-emerald-400">
-                      <span>
-                        Discount
-                        {order.couponCode ? ` (${order.couponCode})` : ''}
-                      </span>
-                      <span className="font-mono">-{formatPrice(order.discount)}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between text-noir-400">
-                    <span>Delivery</span>
-                    <span className="font-mono text-noir-200">
-                      {order.deliveryFee === 0 ? 'Free' : formatPrice(order.deliveryFee)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-baseline pt-2 border-t border-noir-800 text-sm">
-                    <span className="font-medium text-cream-100">Total</span>
-                    <span className="font-serif text-lg font-bold text-gold-300">
-                      {formatPrice(order.total)}
-                    </span>
-                  </div>
-                </div>
+                <OrderTotals
+                  className="rounded-xl bg-noir-900 border border-noir-800 p-4"
+                  subtotal={order.subtotal}
+                  discount={order.discount}
+                  couponCode={order.couponCode}
+                  deliveryFee={order.deliveryFee}
+                  total={order.total}
+                />
 
                 <div className="flex flex-wrap items-center gap-2">
-                  <Link
+                  <ButtonLink
                     href={`/order-confirmed?orderNumber=${encodeURIComponent(order.orderNumber)}`}
-                    className="btn-gold text-xs px-5 py-2.5 tracking-wider"
+                    size="sm"
                   >
                     <Package className="w-3.5 h-3.5" />
                     <span>View Receipt</span>
-                  </Link>
-                  <Link
-                    href="/catalog"
-                    className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full border border-noir-700 text-xs font-medium text-noir-300 hover:text-cream-50 hover:border-noir-500 transition-colors"
-                  >
+                  </ButtonLink>
+                  <ButtonLink href="/catalog" variant="subtle" size="sm">
                     <span>Continue Shopping</span>
                     <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
+                  </ButtonLink>
                 </div>
               </div>
             )}
-          </div>
+          </Card>
         );
       })}
     </div>

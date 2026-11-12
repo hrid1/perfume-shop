@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Sparkles, MapPin, Phone, Mail } from 'lucide-react';
-import { config } from '@/config/app';
+import { config, formatPrice } from '@/config/app';
 
 export function Footer() {
   return (
@@ -103,11 +103,6 @@ export function Footer() {
                   Curated Wishlist
                 </Link>
               </li>
-              <li>
-                <Link href="/admin" className="hover:text-gold-300 transition-colors">
-                  Boutique Portal (Admin)
-                </Link>
-              </li>
             </ul>
           </div>
 
@@ -119,18 +114,29 @@ export function Footer() {
             <ul className="space-y-2.5 text-xs text-noir-400">
               <li className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-gold-400 shrink-0 mt-0.5" />
-                <span>Gulshan 2, Dhaka 1212, Bangladesh</span>
+                <span>{config.contact.address}</span>
               </li>
-              <li className="flex items-center gap-2">
-                <Phone className="w-4 h-4 text-gold-400 shrink-0" />
-                <span>+880 1700-000000</span>
+              <li>
+                <a
+                  href={`tel:${config.contact.phone.replace(/[^\d+]/g, '')}`}
+                  className="flex items-center gap-2 hover:text-gold-300 transition-colors"
+                >
+                  <Phone className="w-4 h-4 text-gold-400 shrink-0" />
+                  <span>{config.contact.phone}</span>
+                </a>
               </li>
-              <li className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-gold-400 shrink-0" />
-                <span>concierge@amrosperfumes.com</span>
+              <li>
+                <a
+                  href={`mailto:${config.contact.email}`}
+                  className="flex items-center gap-2 hover:text-gold-300 transition-colors"
+                >
+                  <Mail className="w-4 h-4 text-gold-400 shrink-0" />
+                  <span>{config.contact.email}</span>
+                </a>
               </li>
               <li className="text-[11px] text-noir-500 pt-2 border-t border-noir-800">
-                Nationwide express delivery (Dhaka ৳60 &bull; Outside Dhaka ৳120)
+                Nationwide express delivery (Dhaka {formatPrice(config.delivery.insideDhaka)}{' '}
+                &bull; Outside Dhaka {formatPrice(config.delivery.outsideDhaka)})
               </li>
             </ul>
           </div>

@@ -4,16 +4,22 @@
 
 This project currently has **no HTTP API endpoints**: there is no `src/app/api` route tree, and the frontend does not make `fetch`/Axios requests. Data is read from `src/data/mockData.ts`, operations run in the browser, and cart, wishlist, and demo user state are stored in `localStorage`.
 
-The only service module is `src/services/index.ts`. Its methods are asynchronous for service-style use, but they read the in-memory mock product list; they do not make network requests.
+`src/services/index.ts` is the **only** module that reads `src/data/mockData.ts` (products, categories, coupons). Pages and contexts call the services, so connecting a backend means changing only the service implementations. Methods are already `async`; today they read in-memory mock data and make no network requests.
+
+Static reference content that won't come from a database lives in its own files: `src/data/locations.ts` (divisions, districts, Dhaka areas), `src/data/quizQuestions.ts`, and `src/data/journalPosts.ts`.
 
 ## Existing service API
 
-| Method | Input | Result | Current use |
-|---|---|---|---|
-| `productsService.search(query)` | Search text | `Promise<Product[]>`; empty/whitespace input returns an empty array. Matches product name, brand, fragrance family, category, and top/middle/base notes. | Navbar search suggestions; results are limited to six in the Navbar. |
-| `productsService.getAll()` | None | `Promise<Product[]>` containing `PRODUCTS`. | Defined but not currently called by a page or component. |
-| `productsService.getBySlug(slug)` | Product slug | `Promise<Product \| undefined>` | Defined but not currently called. Product detail pages look up the product directly in `PRODUCTS`. |
-| `productsService.getByCategory(category)` | Category slug | `Promise<Product[]>` filtered by exact category. | Defined but not currently called. Catalog filtering is performed directly in the catalog page. |
+| Method | Result | Current use |
+|---|---|---|
+| `productsService.getAll()` | All products, including drafts. | `ProductContext` (client-side catalog, admin, wishlist, quiz, search overlay). |
+| `productsService.getActive()` | Active products only. | `sitemap.ts`. |
+| `productsService.getBySlug(slug)` | One active product or `undefined`. | Product detail page and its metadata. |
+| `productsService.getBestSellers(limit)` / `getTrending(limit)` | Flagged active products. | Homepage Best Sellers / Trending sections (server components). |
+| `productsService.getByCategory(category)` | Active products in a category. | Not yet called. |
+| `productsService.search(query)` | Active products matching name, brand, family, category or notes. | Not yet called (the search overlay filters `ProductContext` products). |
+| `categoriesService.getAll()` | All categories. | Admin categories page. |
+| `couponsService.getAll()` | All coupons. | `CouponContext`. |
 
 ## Page and section data/API map
 
@@ -29,7 +35,7 @@ Route groups in parentheses are Next.js organization only; they are not part of 
 | Product detail `/perfume/[slug]` | Product gallery, notes, specs, story, product actions | Finds a product by slug directly in `PRODUCTS`; an unknown slug renders the not-found page. | No HTTP API; `productsService.getBySlug` is not wired here. |
 | Quiz `/quiz` | Questions and recommendations | Reads `QUIZ_QUESTIONS` and `PRODUCTS`; scores active non-discovery-set products in the browser and shows the top three. | No HTTP API. Adding a recommendation to cart uses `CartContext.addItem`. |
 | Wishlist `/wishlist` | Wishlist grid and cards | Reads and updates `WishlistContext`; state is persisted in browser `localStorage`. Product details for cards are resolved from `PRODUCTS`. | No HTTP API. |
-| Checkout `/checkout` | Contact, shipping, payment, order summary, success | Uses `CartContext`; shipping divisions/areas come from mock data. Validates the phone number in the browser. Order submission waits 1.2 seconds, generates a demo order number, and clears the local cart. | **No order endpoint or payment integration exists.** The success screen is a client-side simulation. |
+| Checkout `/checkout` | Contact, shipping, payment, promo code, order summary | Uses `CartContext`; shipping divisions/areas come from `src/data/locations.ts`. The promo-code field lives in the checkout order summary (not the cart drawer). Validates the phone number in the browser. Order submission waits 1.2 seconds, generates an order number (`AMR-YYMMDD-XXXXXX`), saves the order to `localStorage` with `paymentStatus: 'pending'`, and removes the ordered items from the cart. | **No order endpoint or payment integration exists.** Orders are only stored in the customer's browser. |
 | Admin `/admin` | Dashboard, products, orders, customers, coupons, categories | Reads mock products/categories/coupons and local constants for sales, orders, and customers. Search, filtering, and order-status updates are in component state. | No HTTP API; changes are not persisted to a backend. |
 
 ## Client-side context operations (not HTTP endpoints)
@@ -38,7 +44,9 @@ These operations are exposed by React contexts and are used by components as in-
 
 | Context | Operations | Storage / behavior | Main consumers |
 |---|---|---|---|
-| `CartContext` | `addItem`, `removeItem`, `updateQuantity`, `clearCart`, `applyCoupon`, `removeCoupon`, `openCart`, `closeCart` | Cart and coupon are persisted in `localStorage`. Coupon lookup uses mock `COUPONS`; totals and delivery estimates are calculated locally. | Product actions, cart drawer, checkout, quiz recommendations. |
+| `CartContext` | `addItem`, `removeItem`, `updateQuantity`, `clearCart`, `applyCoupon`, `removeCoupon`, `getMaxQuantity`, `openCart`, `closeCart` | Cart and coupon are persisted in `localStorage`. Quantities are capped at the variant's stock. The applied coupon is re-checked on every change (`couponError` explains why it gives no discount, e.g. minimum not met). Totals come from `src/lib/pricing.ts`. | Product actions, cart drawer, checkout, quiz recommendations. |
+| `CouponContext` | `addCoupon`, `markCouponUsed` | Loads coupons via `couponsService`; admin-created coupons and per-code redemption counts (built-in coupons included) are stored in `localStorage`. | Cart, checkout, admin coupons. |
+| `ProductContext` | `addProduct` | Loads products via `productsService`; admin-created products are stored in `localStorage`. | Catalog, product lookup, wishlist, quiz, search, admin. |
 | `WishlistContext` | `toggleWishlist`, `removeItem`, `isInWishlist` | Wishlist is persisted in `localStorage`. | Product actions, navbar count, wishlist page, catalog wishlist filter. |
 | `AuthContext` | `login(email)`, `logout()` | Demo profile is persisted in `localStorage`; login creates a local customer profile and does not authenticate with a server. | Navbar/account UI. |
 | `ToastContext` | Toast notification helpers | In-memory UI notifications. | Cart, wishlist, and other interactive components. |
@@ -66,7 +74,7 @@ The routes below are a **suggested future API contract**, not routes that curren
 | `GET /api/search?q={query}` | Search products (or use `GET /api/products?q=...` instead if search is combined with product listing). | Navbar suggestions. |
 | `GET /api/reviews` | Load published reviews, optionally filtered by product or featured status. | Homepage reviews and product detail reviews. |
 | `POST /api/reviews` | Submit a review after adding server-side validation and any required purchase checks. | Product detail review form (not currently present as a connected submission flow). |
-| `POST /api/coupons/validate` | Validate coupon status, expiry, usage limits, and minimum order against server-owned prices. | Cart drawer and checkout. |
+| `POST /api/coupons/validate` | Validate coupon status, expiry, usage limits, and minimum order against server-owned prices. | Checkout promo-code field. |
 | `POST /api/orders` | Create an order from validated cart items, address, coupon, and payment method; return a persisted order number/status. | Checkout submission. |
 | `GET /api/orders/{orderNumber}` | Retrieve order confirmation/status for a persisted order. | Order confirmation/tracking (tracking page is not currently implemented). |
 | `POST /api/payments/{provider}/checkout` | Initiate a supported payment-provider flow and return its redirect/session details. | Checkout payment selection for bKash, Nagad, or card. |
@@ -111,12 +119,12 @@ Recommended order for replacing the mock behavior with real backend data:
 |---|---|---|
 | Products and catalog | Product cards and catalog filters use mock `PRODUCTS`. Filtering, sorting, and search execute in the browser. | Connect product list/search APIs to the catalog and shared product service. |
 | Home best sellers and trending | Derived from mock product flags. | Use product-list filters (for example `isBestSeller=true` / `isTrending=true`) or a curated homepage endpoint. |
-| Home reviews | Two fixed arrays of named, rated customer testimonials are rendered as “Real feedback”; they are not loaded from a review API. | Replace with approved/persisted reviews. Avoid publishing sample testimonials as real customer feedback. |
-| Home journal | Three fixed article cards; “Browse All Articles” links to `/catalog`, and “Read Article” is not an article-detail link. | Add a content endpoint/CMS and journal index/detail pages, or change the labels/links until article pages exist. |
-| Gift occasions | Four fixed occasion cards all link to `/catalog`; no gift-specific catalog flow is connected. | Add gift collection/product data or route each card to an appropriate filtered collection. |
+| Home reviews | Two fixed arrays of **placeholder** testimonials (no "verified" badges, no "real feedback" claim). They are not loaded from a review API. | Replace with genuine, permission-cleared reviews or a reviews API before launch. |
+| Home journal | Article cards link to `/journal/[slug]`, and “Browse All Articles” links to `/journal`. Posts come from `src/data/journalPosts.ts`. | Move posts to a CMS/content endpoint if editors need to publish without a deploy. |
+| Gift occasions | Each occasion card links to a filtered catalog view (attars, floral, discovery sets, woody). | Add dedicated gift collections if curated gift sets are needed. |
 | Discovery sets | Promo copy and voucher/delivery claims are hard-coded in the section. | Confirm these offers against backend-owned product, coupon, and shipping rules before treating them as live terms. |
 | Checkout/order | Submit is a timed client-side simulation; it generates a random demo order number and clears the cart. Payment options are UI selections only. | Connect `POST /api/orders` and provider checkout/webhooks before accepting real orders or payments. |
-| Coupon validation | Matches the code against local mock `COUPONS`; browser-calculated discount is stored locally. | Connect coupon validation and let the server recalculate the discount at order creation. |
+| Coupon validation | `getCouponProblem()` in `src/lib/pricing.ts` checks active/expiry/usage limit/minimum order in the browser, both when applying and live afterwards. Usage counts are per-browser only. | Connect coupon validation and let the server recalculate the discount and count usage at order creation. |
 | Cart and wishlist | Functional in the current browser, but backed only by `localStorage`; wishlist cards look up products in mock data. | Connect cart/wishlist APIs if persistence across devices/accounts is required. Otherwise these can intentionally remain guest-only browser features. |
 | Authentication | `AuthContext.login` creates a demo profile locally; it does not validate credentials or establish a secure session. | Build real login/logout/session endpoints and protect admin routes on the server. |
 | Admin dashboard | Revenue, order counts, and sales chart are hard-coded; orders/customers are sample constants; order status updates only affect React state. | Connect dashboard metrics, orders, customer records, and status mutation endpoints. |
@@ -126,6 +134,7 @@ Recommended order for replacing the mock behavior with real backend data:
 | Wishlist empty state | Implemented at `/wishlist` when browser wishlist is empty; a loading skeleton appears while local storage is read. | Keep this UX; show it when the connected wishlist API returns an empty list. |
 | Checkout empty state | Implemented at `/checkout` when the cart has no items. | Keep this UX; show it when the cart API returns no items. |
 | Cart/search empty states | Cart drawer has an empty-bag state; Navbar search has a no-results message. | Keep these states for empty API responses, and add a separate visible error state for failed requests. |
-| Routes not currently present | No dedicated customer account/login page, order-history or order-tracking page, journal article page, or product-review section is present in the app route tree. | Build these pages only if those features are in scope; the suggested endpoints alone do not create the UI. |
+| Error handling | `src/app/not-found.tsx` (404), `src/app/error.tsx` (route errors, with retry) and `src/app/global-error.tsx` (root-layout failures) exist. | Add an error-reporting service (e.g. Sentry) in `error.tsx` / `global-error.tsx`. |
+| Routes not currently present | `/account` (demo login, profile, addresses, order history from `localStorage`) and `/journal/[slug]` exist. There is no guest order-tracking page (order number + phone) and no product-review section. | Build guest order tracking together with `GET /api/orders/{orderNumber}`. |
 
 Protect all `/api/admin/*` routes with server-side authorization. Prices, inventory, coupon eligibility, order totals, and payment status must be checked on the server rather than trusted from browser state.

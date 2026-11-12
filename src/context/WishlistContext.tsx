@@ -1,6 +1,8 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode } from 'react';
+import { usePersistentState } from '@/hooks/usePersistentState';
+import { isArray } from '@/lib/storage';
 import { WishlistItem, Product } from '@/types';
 import { useToast } from './ToastContext';
 
@@ -15,35 +17,15 @@ interface WishlistContextType {
 }
 
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
-const WISHLIST_STORAGE_KEY = 'noire_perfumes_wishlist_v1';
+const isWishlistItems = isArray<WishlistItem>;
 
 export function WishlistProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<WishlistItem[]>([]);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [items, setItems, isLoaded] = usePersistentState<WishlistItem[]>(
+    'wishlist',
+    [],
+    isWishlistItems
+  );
   const { success, info } = useToast();
-
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(WISHLIST_STORAGE_KEY);
-      if (saved) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setItems(JSON.parse(saved));
-      }
-    } catch (e) {
-      console.error('Failed to load wishlist', e);
-    } finally {
-      setIsLoaded(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!isLoaded) return;
-    try {
-      localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(items));
-    } catch (e) {
-      console.error('Failed to save wishlist', e);
-    }
-  }, [items, isLoaded]);
 
   const isInWishlist = (productId: string) => {
     return items.some((item) => item.productId === productId);

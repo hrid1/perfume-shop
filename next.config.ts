@@ -42,7 +42,6 @@ const nextConfig: NextConfig = {
       { source: '/new-arrivals', destination: '/catalog?category=new-arrivals' },
       { source: '/best-sellers', destination: '/catalog?category=best-sellers' },
       { source: '/search', destination: '/catalog' },
-      { source: '/wishlist', destination: '/catalog?filter=wishlist' },
       { source: '/cart', destination: '/checkout' },
       { source: '/login', destination: '/account' },
       { source: '/products', destination: '/catalog' },

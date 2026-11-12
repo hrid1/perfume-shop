@@ -2,44 +2,70 @@
 
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { Coupon } from '@/types';
-import { COUPONS } from '@/data/mockData';
+import { couponsService } from '@/services';
+import { isArray, readStorage, writeStorage } from '@/lib/storage';
+import { usePersistentState } from '@/hooks/usePersistentState';
 import { useToast } from './ToastContext';
 
 interface CouponContextValue {
+  /** All coupons with `usedCount` including redemptions made in this browser. */
   coupons: Coupon[];
   isLoaded: boolean;
   addCoupon: (coupon: Coupon) => { success: boolean; message: string };
   markCouponUsed: (code: string) => void;
 }
 
+type CouponUsage = Record<string, number>;
+
 const CouponContext = createContext<CouponContextValue | undefined>(undefined);
-const STORAGE_KEY = 'noire_perfumes_custom_coupons_v1';
+const isList = isArray<Coupon>;
+const isUsageMap = (value: unknown): value is CouponUsage =>
+  typeof value === 'object' &&
+  value !== null &&
+  !Array.isArray(value) &&
+  Object.values(value).every((count) => typeof count === 'number');
 
 export function CouponProvider({ children }: { children: React.ReactNode }) {
+  const [catalogCoupons, setCatalogCoupons] = useState<Coupon[]>([]);
   const [customCoupons, setCustomCoupons] = useState<Coupon[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [usage, setUsage, usageLoaded] = usePersistentState<CouponUsage>(
+    'couponUsage',
+    {},
+    isUsageMap
+  );
   const { success, error } = useToast();
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed: unknown = JSON.parse(saved);
-        if (!Array.isArray(parsed)) {
-          throw new Error('Saved coupon data is not a list');
-        }
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setCustomCoupons(parsed as Coupon[]);
-      }
-    } catch (loadError) {
-      console.error('Failed to load custom coupons', loadError);
-      error('Saved coupons could not be loaded');
-    } finally {
-      setIsLoaded(true);
-    }
-  }, [error]);
+    let cancelled = false;
+    // Admin-created coupons only exist in this browser until a backend is connected.
+    const saved = readStorage('customCoupons', isList);
 
-  const coupons = useMemo(() => [...COUPONS, ...customCoupons], [customCoupons]);
+    couponsService
+      .getAll()
+      .then((loaded) => {
+        if (!cancelled) setCatalogCoupons(loaded);
+      })
+      .catch((err) => console.error('Failed to load coupons', err))
+      .finally(() => {
+        if (cancelled) return;
+        if (saved) setCustomCoupons(saved);
+        setIsLoaded(true);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const coupons = useMemo(
+    () =>
+      [...catalogCoupons, ...customCoupons].map((coupon) => {
+        const localUses = usage[coupon.code] ?? 0;
+        return localUses ? { ...coupon, usedCount: coupon.usedCount + localUses } : coupon;
+      }),
+    [catalogCoupons, customCoupons, usage]
+  );
 
   const addCoupon = useCallback((coupon: Coupon) => {
     if (coupons.some((item) => item.code.toUpperCase() === coupon.code.toUpperCase())) {
@@ -49,10 +75,7 @@ export function CouponProvider({ children }: { children: React.ReactNode }) {
     }
 
     const updatedCoupons = [...customCoupons, coupon];
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedCoupons));
-    } catch (saveError) {
-      console.error('Failed to save coupon', saveError);
+    if (!writeStorage('customCoupons', updatedCoupons)) {
       const message = 'Coupon could not be saved in this browser';
       error(message);
       return { success: false, message };
@@ -63,25 +86,15 @@ export function CouponProvider({ children }: { children: React.ReactNode }) {
     return { success: true, message: 'Coupon created successfully' };
   }, [coupons, customCoupons, error, success]);
 
+  /** Records one redemption. Works for built-in and admin-created coupons alike. */
   const markCouponUsed = useCallback((code: string) => {
-    const updatedCoupons = customCoupons.map((coupon) =>
-      coupon.code === code
-        ? { ...coupon, usedCount: Math.min(coupon.usageLimit, coupon.usedCount + 1) }
-        : coupon
-    );
-    if (updatedCoupons.every((coupon, index) => coupon === customCoupons[index])) return;
-
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedCoupons));
-      setCustomCoupons(updatedCoupons);
-    } catch (saveError) {
-      console.error('Failed to update coupon usage', saveError);
-      error('Coupon usage could not be recorded');
-    }
-  }, [customCoupons, error]);
+    setUsage((prev) => ({ ...prev, [code]: (prev[code] ?? 0) + 1 }));
+  }, [setUsage]);
 
   return (
-    <CouponContext.Provider value={{ coupons, isLoaded, addCoupon, markCouponUsed }}>
+    <CouponContext.Provider
+      value={{ coupons, isLoaded: isLoaded && usageLoaded, addCoupon, markCouponUsed }}
+    >
       {children}
     </CouponContext.Provider>
   );

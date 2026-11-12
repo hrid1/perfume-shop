@@ -24,7 +24,7 @@ import { AccountSidebar, type AccountTab } from './AccountSidebar';
 import { AccountProfileSection } from './AccountProfileSection';
 import { AccountOrdersSection } from './AccountOrdersSection';
 import { AccountAddressesSection } from './AccountAddressesSection';
-import { filterOrdersForUser, ORDER_HISTORY_STORAGE_KEY } from './orderUtils';
+import { filterOrdersForUser, loadOrderHistory } from '@/lib/orders';
 
 function getInitials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -66,20 +66,10 @@ export function AccountPageClient() {
   };
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(ORDER_HISTORY_STORAGE_KEY);
-      if (saved) {
-        const parsed: unknown = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
-          // eslint-disable-next-line react-hooks/set-state-in-effect
-          setOrders(parsed as Order[]);
-        }
-      }
-    } catch (e) {
-      console.error('Failed to load order history', e);
-    } finally {
-      setOrdersLoaded(true);
-    }
+    // Orders live in localStorage, so they can only be read after mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setOrders(loadOrderHistory());
+    setOrdersLoaded(true);
   }, [user?.id]);
 
   const userOrders = useMemo(

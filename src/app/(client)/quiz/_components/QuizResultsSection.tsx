@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Sparkles, ShoppingBag, RotateCcw } from 'lucide-react';
 import { Product } from '@/types';
 import { formatPrice } from '@/config/app';
+import { getEffectivePrice } from '@/lib/pricing';
 
 export interface ScoredProduct {
   product: Product;
@@ -41,7 +42,7 @@ export function QuizResultsSection({
 
       <div className="space-y-6">
         {results.map(({ product, matchPercentage }, index) => {
-          const currentPrice = product.discountPrice || product.price;
+          const currentPrice = getEffectivePrice(product);
           return (
             <div
               key={product.id}

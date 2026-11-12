@@ -19,7 +19,7 @@ export function CheckoutPaymentSelection({
         3. Payment Selection
       </h2>
       <p className="text-[11px] text-gold-400 font-mono mb-4">
-        Note: Payment processing is simulated for demonstration. No real money will be charged.
+        Online payment isn&apos;t connected yet. Your order is placed as payment pending, and our team will contact you to confirm payment.
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

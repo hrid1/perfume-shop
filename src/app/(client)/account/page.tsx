@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { Metadata } from 'next';
 import { AccountPageClient } from './_components';
+import { PageLoader } from '@/components/ui';
 
 export const metadata: Metadata = {
   title: 'My Account',
@@ -11,11 +12,7 @@ export const metadata: Metadata = {
 export default function AccountPage() {
   return (
     <Suspense
-      fallback={
-        <div className="container-lux py-16 text-center text-noir-400 font-mono text-sm">
-          Loading client dashboard...
-        </div>
-      }
+      fallback={<PageLoader message="Loading client dashboard..." />}
     >
       <AccountPageClient />
     </Suspense>

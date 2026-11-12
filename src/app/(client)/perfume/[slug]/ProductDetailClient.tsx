@@ -14,6 +14,7 @@ import {
   ProductNotesPyramid,
   ProductStory,
 } from './_components';
+import { getEffectivePrice } from '@/lib/pricing';
 
 interface Props {
   product: Product;
@@ -30,7 +31,7 @@ export function ProductDetailClient({ product }: Props) {
   const [addedToCart, setAddedToCart] = useState(false);
 
   const isFavorited = isInWishlist(product.id);
-  const currentPrice = selectedVariant.discountPrice || selectedVariant.price;
+  const currentPrice = getEffectivePrice(selectedVariant);
   const originalPrice = selectedVariant.price;
   const hasDiscount =
     selectedVariant.discountPrice != null &&

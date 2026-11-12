@@ -2,31 +2,18 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Clock } from 'lucide-react';
 import { JOURNAL_POSTS } from '@/data/journalPosts';
+import { SectionHeader } from '@/components/ui';
 
 export function JournalSection() {
   return (
     <section className="w-full">
       <div className="container-lux">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 pb-4 border-b border-noir-800">
-          <div>
-            <span className="text-xs uppercase tracking-[0.16em] text-gold-400 font-medium">
-              Fragrance Guides
-            </span>
-            <h2 className="font-serif text-3xl md:text-4xl font-semibold text-noir-50 mt-1">
-              The Amros Perfumes Journal
-            </h2>
-            <p className="text-sm text-noir-400 mt-1">
-              Guides on fragrance notes, longevity, and seasonal choices.
-            </p>
-          </div>
-          <Link
-            href="/journal"
-            className="mt-4 md:mt-0 text-xs uppercase tracking-wider text-gold-400 hover:text-gold-300 flex items-center gap-1 group font-medium"
-          >
-            <span>Browse All Articles</span>
-            <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-          </Link>
-        </div>
+        <SectionHeader
+          eyebrow="Fragrance Guides"
+          title="The Amros Perfumes Journal"
+          description="Guides on fragrance notes, longevity, and seasonal choices."
+          action={{ href: '/journal', label: 'Browse All Articles' }}
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {JOURNAL_POSTS.map((post) => (

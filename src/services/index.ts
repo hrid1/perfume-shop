@@ -1,41 +1,56 @@
-import { PRODUCTS } from '@/data/mockData';
-import { Product } from '@/types';
+/**
+ * Data-access layer. Every read of products, categories and coupons goes through here,
+ * so connecting a real backend means changing only these implementations — not pages.
+ *
+ * Today they read in-memory mock data; later each method becomes a fetch/DB query.
+ * Methods are async on purpose so callers already handle the network-shaped API.
+ */
+import { CATEGORIES, COUPONS, PRODUCTS } from '@/data/mockData';
+import type { Category, Coupon, Product } from '@/types';
+import { searchProducts } from '@/lib/search';
+
+const isActive = (product: Product) => product.status === 'active';
 
 export const productsService = {
-  async search(query: string): Promise<Product[]> {
-    const q = query.trim().toLowerCase();
-    if (!q) return [];
-    
-    return PRODUCTS.filter((p) => {
-      const matchName = p.name.toLowerCase().includes(q);
-      const matchBrand = p.brand.toLowerCase().includes(q);
-      const matchFamily = p.fragranceFamily.toLowerCase().includes(q);
-      const matchCategory = p.category.toLowerCase().includes(q);
-      const matchTopNotes = p.topNotes?.some((n) => n.toLowerCase().includes(q));
-      const matchMiddleNotes = p.middleNotes?.some((n) => n.toLowerCase().includes(q));
-      const matchBaseNotes = p.baseNotes?.some((n) => n.toLowerCase().includes(q));
-
-      return (
-        matchName ||
-        matchBrand ||
-        matchFamily ||
-        matchCategory ||
-        matchTopNotes ||
-        matchMiddleNotes ||
-        matchBaseNotes
-      );
-    });
-  },
-
+  /** Every product, including drafts — for admin views. */
   async getAll(): Promise<Product[]> {
     return PRODUCTS;
   },
 
+  /** Products visible on the storefront. */
+  async getActive(): Promise<Product[]> {
+    return PRODUCTS.filter(isActive);
+  },
+
   async getBySlug(slug: string): Promise<Product | undefined> {
-    return PRODUCTS.find((p) => p.slug === slug);
+    return PRODUCTS.find((p) => p.slug === slug && isActive(p));
   },
 
   async getByCategory(category: string): Promise<Product[]> {
-    return PRODUCTS.filter((p) => p.category === category);
+    return PRODUCTS.filter((p) => p.category === category && isActive(p));
+  },
+
+  async getBestSellers(limit = 4): Promise<Product[]> {
+    return PRODUCTS.filter((p) => p.bestSeller && isActive(p)).slice(0, limit);
+  },
+
+  async getTrending(limit = 4): Promise<Product[]> {
+    return PRODUCTS.filter((p) => p.trending && isActive(p)).slice(0, limit);
+  },
+
+  async search(query: string): Promise<Product[]> {
+    return searchProducts(PRODUCTS.filter(isActive), query);
+  },
+};
+
+export const categoriesService = {
+  async getAll(): Promise<Category[]> {
+    return CATEGORIES;
+  },
+};
+
+export const couponsService = {
+  async getAll(): Promise<Coupon[]> {
+    return COUPONS;
   },
 };

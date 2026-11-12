@@ -16,7 +16,7 @@ import {
 import { useAuth, type UserProfile } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
 import type { Order } from '@/types';
-import { formatOrderDate } from './orderUtils';
+import { formatOrderDate } from '@/lib/orders';
 
 interface AccountProfileSectionProps {
   user: UserProfile;

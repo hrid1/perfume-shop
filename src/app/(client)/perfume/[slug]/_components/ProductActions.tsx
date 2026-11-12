@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Product, ProductVariant } from '@/types';
 import { formatPrice } from '@/config/app';
+import { getEffectivePrice } from '@/lib/pricing';
 
 interface ProductActionsProps {
   product: Product;
@@ -106,7 +107,7 @@ export function ProductActions({
         </div>
         <div className="flex gap-3 flex-wrap">
           {product.sizes.map((variant) => {
-            const vPrice = variant.discountPrice || variant.price;
+            const vPrice = getEffectivePrice(variant);
             const isSelected = selectedVariant.id === variant.id;
             const outOfStock = variant.stock === 0;
             return (
@@ -195,6 +196,8 @@ export function ProductActions({
         </button>
         <button
           onClick={onToggleFavorite}
+          aria-label={isFavorited ? 'Remove from wishlist' : 'Add to wishlist'}
+          aria-pressed={isFavorited}
           className={`w-12 h-12 xl:w-10 xl:h-10 rounded-full border flex items-center justify-center flex-shrink-0 transition-all duration-200 cursor-pointer ${
             isFavorited
               ? 'border-gold-400 bg-gold-400/10 text-gold-400'

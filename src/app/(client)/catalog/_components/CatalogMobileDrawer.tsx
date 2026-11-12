@@ -43,6 +43,7 @@ export function CatalogMobileDrawer({
           <span className="font-serif text-xl font-medium text-noir-100">Filters</span>
           <button
             onClick={onClose}
+            aria-label="Close filters"
             className="p-1.5 text-noir-400 hover:text-noir-100 rounded-lg hover:bg-noir-900 cursor-pointer"
           >
             <X className="w-5 h-5" />

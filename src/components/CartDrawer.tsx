@@ -1,11 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { X, Plus, Minus, Trash2, ShoppingBag, ArrowRight, Sparkles, Tag } from 'lucide-react';
+import { X, Plus, Minus, Trash2, ShoppingBag, ArrowRight, Sparkles } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { formatPrice } from '@/config/app';
+import { useOverlay } from '@/hooks/useOverlay';
+import { OrderTotals } from '@/components/order';
 
 export function CartDrawer() {
   const {
@@ -20,52 +22,20 @@ export function CartDrawer() {
     subtotal,
     discount,
     couponCode,
-    applyCoupon,
-    removeCoupon,
+    couponError,
+    getMaxQuantity,
     deliveryFee,
     total,
     freeDeliveryThreshold,
     amountNeededForFreeDelivery,
   } = useCart();
 
-  const [couponInput, setCouponInput] = useState('');
-
-  // Lock body scroll when cart is open
-  useEffect(() => {
-    if (isCartOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isCartOpen]);
-
-  // Support closing with Escape key
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isCartOpen) {
-        closeCart();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isCartOpen, closeCart]);
+  useOverlay(isCartOpen, closeCart);
 
   const progressPercent = Math.min(
     100,
     Math.round(((freeDeliveryThreshold - amountNeededForFreeDelivery) / freeDeliveryThreshold) * 100)
   );
-
-  const handleApplyCoupon = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!couponInput) return;
-    const res = applyCoupon(couponInput);
-    if (res.success) {
-      setCouponInput('');
-    }
-  };
 
   return (
     <div
@@ -84,6 +54,9 @@ export function CartDrawer() {
 
       {/* Drawer content - Right side slide-in with luxury easing */}
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Your scent bag"
         className={`relative w-full max-w-md bg-noir-950 border-l border-noir-800 text-noir-50 flex flex-col h-full shadow-[-10px_0_35px_rgba(0,0,0,0.85)] z-10 transform transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
           isCartOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
@@ -102,6 +75,7 @@ export function CartDrawer() {
           </div>
           <button
             onClick={closeCart}
+            aria-label="Close bag"
             className="p-1.5 rounded-full text-noir-400 hover:text-noir-100 hover:bg-noir-900 transition-colors"
           >
             <X className="w-5 h-5" />
@@ -143,12 +117,13 @@ export function CartDrawer() {
               <p className="text-sm text-noir-400 max-w-xs mb-6">
                 Discover exceptional haute fragrances to elevate your personal presence.
               </p>
-              <button
+              <Link
+                href="/catalog"
                 onClick={closeCart}
                 className="btn-gold text-xs tracking-wider"
               >
                 Explore Catalog
-              </button>
+              </Link>
             </div>
           ) : (
             items.map((item) => (
@@ -179,6 +154,7 @@ export function CartDrawer() {
                         onClick={() => removeItem(item.id)}
                         className="text-noir-500 hover:text-red-400 transition-colors p-1"
                         title="Remove"
+                        aria-label={`Remove ${item.name} from bag`}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -191,6 +167,7 @@ export function CartDrawer() {
                     <div className="flex items-center border border-noir-700 rounded-full bg-noir-900">
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        aria-label={`Decrease quantity of ${item.name}`}
                         className="p-1 hover:text-gold-400 transition-colors"
                       >
                         <Minus className="w-3 h-3" />
@@ -198,7 +175,14 @@ export function CartDrawer() {
                       <span className="w-7 text-center text-xs font-mono">{item.quantity}</span>
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        className="p-1 hover:text-gold-400 transition-colors"
+                        disabled={item.quantity >= getMaxQuantity(item)}
+                        aria-label={`Increase quantity of ${item.name}`}
+                        title={
+                          item.quantity >= getMaxQuantity(item)
+                            ? `Only ${getMaxQuantity(item)} available`
+                            : undefined
+                        }
+                        className="p-1 hover:text-gold-400 transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:text-inherit"
                       >
                         <Plus className="w-3 h-3" />
                       </button>
@@ -216,66 +200,21 @@ export function CartDrawer() {
         {/* Footer & Checkout CTA */}
         {items.length > 0 && (
           <div className="p-5 border-t border-noir-800 bg-noir-900/60 flex flex-col gap-3">
-            {/* Coupon Code */}
-            {couponCode ? (
-              <div className="flex items-center justify-between px-3 py-2 bg-gold-400/10 border border-gold-400/30 rounded text-xs">
-                <div className="flex items-center gap-1.5 text-gold-300 font-mono">
-                  <Tag className="w-3.5 h-3.5" />
-                  <span>{couponCode}</span>
-                  <span className="text-gold-200">(-{formatPrice(discount)})</span>
-                </div>
-                <button
-                  onClick={removeCoupon}
-                  className="text-noir-400 hover:text-noir-100 text-[11px] underline"
-                >
-                  Remove
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={handleApplyCoupon} className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="Promo code (e.g. WELCOME10)"
-                  value={couponInput}
-                  onChange={(e) => setCouponInput(e.target.value)}
-                  className="flex-1 bg-noir-950 border border-noir-800 px-3 py-1.5 text-xs rounded text-noir-200 placeholder:text-noir-500 focus:outline-none focus:border-gold-400 uppercase tracking-wider"
-                />
-                <button
-                  type="submit"
-                  className="px-3 py-1.5 bg-noir-800 hover:bg-noir-700 border border-noir-700 text-xs font-medium rounded text-gold-300 transition-colors uppercase tracking-wider"
-                >
-                  Apply
-                </button>
-              </form>
+            {couponCode && couponError && (
+              <p className="text-[11px] text-amber-300/90 bg-amber-500/10 border border-amber-500/20 rounded px-3 py-2">
+                {couponCode}: {couponError}
+              </p>
             )}
 
-            {/* Calculations */}
-            <div className="space-y-1.5 text-xs text-noir-300 pt-2 border-t border-noir-800/80">
-              <div className="flex justify-between">
-                <span>Subtotal</span>
-                <span className="font-mono text-noir-100">{formatPrice(subtotal)}</span>
-              </div>
-              {discount > 0 && (
-                <div className="flex justify-between text-gold-400">
-                  <span>Promo Discount</span>
-                  <span className="font-mono">-{formatPrice(discount)}</span>
-                </div>
-              )}
-              <div className="flex justify-between">
-                <span>Estimated Delivery</span>
-                <span className="font-mono text-noir-100">
-                  {deliveryFee === 0 ? (
-                    <span className="text-gold-400 uppercase tracking-wider text-[11px]">Free</span>
-                  ) : (
-                    formatPrice(deliveryFee)
-                  )}
-                </span>
-              </div>
-              <div className="flex justify-between text-sm font-medium text-noir-50 pt-2 border-t border-noir-800">
-                <span className="font-serif text-base">Grand Total</span>
-                <span className="font-mono text-base text-gold-300 font-bold">{formatPrice(total)}</span>
-              </div>
-            </div>
+            <OrderTotals
+              subtotal={subtotal}
+              discount={discount}
+              couponCode={couponCode}
+              deliveryFee={deliveryFee}
+              total={total}
+              deliveryLabel="Estimated Delivery"
+              totalLabel="Grand Total"
+            />
 
             {/* CTA Button */}
             <Link

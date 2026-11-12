@@ -4,7 +4,7 @@ import React, { useMemo } from 'react';
 import Link from 'next/link';
 import { ArrowRight, MapPin, Phone, Truck } from 'lucide-react';
 import type { Order } from '@/types';
-import { formatOrderDate, normalize } from './orderUtils';
+import { formatOrderDate, normalize } from '@/lib/orders';
 
 interface AccountAddressesSectionProps {
   orders: Order[];

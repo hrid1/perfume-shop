@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { QUIZ_QUESTIONS } from '@/data/mockData';
+import { QUIZ_QUESTIONS } from '@/data/quizQuestions';
 import { Product } from '@/types';
 import { useCart } from '@/context/CartContext';
 import { useProducts } from '@/context/ProductContext';
@@ -10,6 +10,7 @@ import {
   QuizResultsSection,
   type ScoredProduct,
 } from './_components';
+import { getEffectivePrice } from '@/lib/pricing';
 
 export default function QuizPage() {
   const { addItem } = useCart();
@@ -61,7 +62,7 @@ export default function QuizPage() {
         }
 
         // Budget match (+2)
-        const price = product.discountPrice || product.price;
+        const price = getEffectivePrice(product);
         if (q4 === 'under-3000' && price < 3000) {
           score += 2;
         } else if (q4 === '3000-5000' && price >= 3000 && price <= 5000) {

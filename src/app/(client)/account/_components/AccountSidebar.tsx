@@ -7,13 +7,13 @@ import {
   Heart,
   LogOut,
   MapPin,
-  MessageCircle,
   Package,
   Sparkles,
   UserRound,
 } from 'lucide-react';
 import { useAuth, type UserProfile } from '@/context/AuthContext';
 import { useWishlist } from '@/context/WishlistContext';
+import { Card, WhatsAppLink } from '@/components/ui';
 
 export type AccountTab = 'profile' | 'orders' | 'addresses';
 
@@ -110,7 +110,7 @@ export function AccountSidebar({
       </div>
 
       {/* Concierge Card */}
-      <div className="card-lux p-5 border border-gold-400/20 bg-gradient-to-br from-noir-900 to-noir-950 text-xs">
+      <Card tone="highlight" className="p-5 text-xs">
         <div className="flex items-center gap-2 text-gold-400 font-medium mb-1.5">
           <Sparkles className="w-3.5 h-3.5" />
           <span className="text-[11px] uppercase tracking-wider">Client Concierge</span>
@@ -121,18 +121,13 @@ export function AccountSidebar({
         <p className="text-noir-400 leading-relaxed mb-4 text-[11px] font-light">
           Need guidance on maceration, batch allocations, or an active delivery?
         </p>
-        <a
-          href={`https://wa.me/8801700000000?text=${encodeURIComponent(
-            'Hello Amros Perfumes, I would like assistance with my account and orders.'
-          )}`}
-          target="_blank"
-          rel="noreferrer"
-          className="w-full py-2.5 px-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/25 transition-colors flex items-center justify-center gap-2 font-medium cursor-pointer"
+        <WhatsAppLink
+          className="px-3"
+          message="Hello Amros Perfumes, I would like assistance with my account and orders."
         >
-          <MessageCircle className="w-4 h-4 text-emerald-400" />
-          <span>Message on WhatsApp</span>
-        </a>
-      </div>
+          Message on WhatsApp
+        </WhatsAppLink>
+      </Card>
 
       {/* Sign Out Card */}
       <div className="card-lux p-2 border border-noir-800 bg-noir-900/80">

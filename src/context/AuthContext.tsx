@@ -1,6 +1,7 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode } from 'react';
+import { usePersistentState } from '@/hooks/usePersistentState';
 
 export interface UserProfile {
   id: string;
@@ -20,36 +21,26 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-const AUTH_STORAGE_KEY = 'noire_perfumes_user';
+const isUserProfile = (value: unknown): value is UserProfile =>
+  typeof value === 'object' && value !== null && typeof (value as UserProfile).email === 'string';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  useEffect(() => {
-    try {
-      const savedUser = localStorage.getItem(AUTH_STORAGE_KEY);
-      if (savedUser) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setUser(JSON.parse(savedUser));
-      }
-    } catch (e) {
-      console.error('Failed to parse user session', e);
-    } finally {
-      setIsLoaded(true);
-    }
-  }, []);
+  const [user, setUser, isLoaded] = usePersistentState<UserProfile | null>(
+    'user',
+    null,
+    isUserProfile
+  );
 
   const login = (email: string, name?: string) => {
     const newUser: UserProfile = {
-      id: 'usr-1',
+      // Derive the id from the email so different accounts on one browser don't share order history.
+      id: `usr-${email.trim().toLowerCase()}`,
       name: name?.trim() || email.split('@')[0] || 'Connoisseur',
       email: email.trim(),
       role: 'customer',
       createdAt: new Date().toISOString(),
     };
     setUser(newUser);
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(newUser));
   };
 
   const updateProfile = (updates: Partial<Pick<UserProfile, 'name' | 'email'>>) => {
@@ -63,16 +54,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     setUser(updated);
-    try {
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(updated));
-    } catch (e) {
-      console.error('Failed to save user session', e);
-    }
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem(AUTH_STORAGE_KEY);
   };
 
   return (

@@ -2,7 +2,8 @@
 
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { Product } from '@/types';
-import { PRODUCTS } from '@/data/mockData';
+import { productsService } from '@/services';
+import { isArray, readStorage, writeStorage } from '@/lib/storage';
 import { useToast } from './ToastContext';
 
 interface ProductContextValue {
@@ -12,35 +13,43 @@ interface ProductContextValue {
 }
 
 const ProductContext = createContext<ProductContextValue | undefined>(undefined);
-const STORAGE_KEY = 'noire_perfumes_custom_products_v1';
+const isList = isArray<Product>;
 
 export function ProductProvider({ children }: { children: React.ReactNode }) {
+  const [catalogProducts, setCatalogProducts] = useState<Product[]>([]);
   const [customProducts, setCustomProducts] = useState<Product[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const { success, error } = useToast();
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed: unknown = JSON.parse(saved);
-        if (!Array.isArray(parsed)) {
-          throw new Error('Saved product data is not a list');
-        }
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setCustomProducts(parsed as Product[]);
-      }
-    } catch (loadError) {
-      console.error('Failed to load custom products', loadError);
-      error('Saved products could not be loaded');
-    } finally {
-      setIsLoaded(true);
-    }
+    let cancelled = false;
+
+    // Admin-created products only exist in this browser until a backend is connected.
+    const saved = readStorage('customProducts', isList);
+
+    productsService
+      .getAll()
+      .then((loaded) => {
+        if (!cancelled) setCatalogProducts(loaded);
+      })
+      .catch((err) => {
+        console.error('Failed to load products', err);
+        if (!cancelled) error('Could not load the catalog. Please refresh the page.');
+      })
+      .finally(() => {
+        if (cancelled) return;
+        if (saved) setCustomProducts(saved);
+        setIsLoaded(true);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [error]);
 
   const products = useMemo(
-    () => [...PRODUCTS, ...customProducts],
-    [customProducts]
+    () => [...catalogProducts, ...customProducts],
+    [catalogProducts, customProducts]
   );
 
   const addProduct = (product: Product) => {
@@ -51,10 +60,7 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
     }
 
     const updatedProducts = [...customProducts, product];
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedProducts));
-    } catch (saveError) {
-      console.error('Failed to save custom product', saveError);
+    if (!writeStorage('customProducts', updatedProducts)) {
       const message = 'Product could not be saved in this browser';
       error(message);
       return { success: false, message };

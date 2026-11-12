@@ -2,6 +2,7 @@ import Link from 'next/link';
 import {
   Leaf, TreePine, Flower2, Cookie, Flame, Citrus, Droplets, Moon,
 } from 'lucide-react';
+import { SectionHeader } from '@/components/ui';
 
 const FRAGRANCE_FAMILIES = [
   { name: 'Fresh', icon: Leaf, color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
@@ -18,17 +19,12 @@ export function FragranceFamiliesSection() {
   return (
     <section className="w-full">
       <div className="container-lux">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="text-xs uppercase tracking-[0.16em] text-gold-400 font-medium">
-            Fragrance Families
-          </span>
-          <h2 className="font-serif text-3xl md:text-4xl font-semibold text-noir-50 mt-1">
-            Shop by Scent Profile
-          </h2>
-          <p className="text-sm text-noir-400 mt-2">
-            Find your signature scent based on the notes and accords you love.
-          </p>
-        </div>
+        <SectionHeader
+          align="center"
+          eyebrow="Fragrance Families"
+          title="Shop by Scent Profile"
+          description="Find your signature scent based on the notes and accords you love."
+        />
 
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
           {FRAGRANCE_FAMILIES.map((family) => {

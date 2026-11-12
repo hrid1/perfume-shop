@@ -3,9 +3,14 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
-import { BANGLADESH_DIVISIONS } from '@/data/mockData';
+import { BANGLADESH_DIVISIONS } from '@/data/locations';
 import { PaymentMethod, Order } from '@/types';
 import { useCoupons } from '@/context/CouponContext';
+import { useAuth } from '@/context/AuthContext';
+import { calcOrderTotals, getDeliveryZone, getEstimatedDelivery } from '@/lib/pricing';
+import { generateOrderNumber, saveOrder } from '@/lib/orders';
+import { ShoppingBag } from 'lucide-react';
+import { Button, EmptyState } from '@/components/ui';
 import {
   CheckoutHeader,
   CheckoutEmptyState,
@@ -23,11 +28,12 @@ export default function CheckoutPage() {
     subtotal,
     discount,
     couponCode,
+    couponError,
     completeCheckout,
-    freeDeliveryThreshold,
     openCart,
   } = useCart();
   const { markCouponUsed } = useCoupons();
+  const { user } = useAuth();
 
   // Form State
   const [fullName, setFullName] = useState('');
@@ -46,14 +52,15 @@ export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const districtsForDivision = BANGLADESH_DIVISIONS[division] || [];
-  const isDhakaCity = division === 'Dhaka' && district === 'Dhaka';
+  const deliveryZone = getDeliveryZone(division, district);
+  const isDhakaCity = deliveryZone === 'insideDhaka';
 
-  // Calculate delivery fee
-  const netSubtotal = Math.max(0, subtotal - discount);
-  const isFreeDelivery = netSubtotal >= freeDeliveryThreshold && netSubtotal > 0;
-  const deliveryFee =
-    selectedItems.length === 0 ? 0 : isFreeDelivery ? 0 : isDhakaCity ? 60 : 120;
-  const grandTotal = Math.max(0, netSubtotal + deliveryFee);
+  const { deliveryFee, total: grandTotal } = calcOrderTotals({
+    subtotal,
+    discount,
+    itemCount: selectedItems.length,
+    zone: deliveryZone,
+  });
 
   const handleDivisionChange = (newDivision: string) => {
     setDivision(newDivision);
@@ -78,11 +85,14 @@ export default function CheckoutPage() {
 
     setIsSubmitting(true);
     setTimeout(() => {
-      const generatedOrderNumber = `AMR-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+      const generatedOrderNumber = generateOrderNumber();
+      // Only record a coupon that actually gave a discount on this order.
+      const usedCoupon = couponCode && !couponError && discount > 0 ? couponCode : undefined;
 
       const completedOrder: Order = {
         id: `ord-${Date.now()}`,
         orderNumber: generatedOrderNumber,
+        userId: user?.id,
         customer: {
           name: fullName,
           phone,
@@ -101,37 +111,28 @@ export default function CheckoutPage() {
           phone,
           division,
           district,
-          area: area === 'Other' && customArea ? customArea : area,
+          // Dhaka city picks from a list; everywhere else the customer types the area.
+          area: isDhakaCity ? area : customArea.trim(),
           fullAddress,
           instructions: notes || undefined,
         },
         paymentMethod,
-        paymentStatus: paymentMethod === 'cod' ? 'pending' : 'paid',
+        // No payment gateway is connected yet, so nothing has been charged. Only mark an
+        // order "paid" once a real gateway confirms it (server-side webhook).
+        paymentStatus: 'pending',
         subtotal,
         deliveryFee,
         discount,
         total: grandTotal,
-        couponCode: couponCode || undefined,
+        couponCode: usedCoupon,
         status: 'placed',
-        estimatedDelivery: isDhakaCity
-          ? '2–3 business days (Dhaka Express)'
-          : '3–5 business days (Nationwide)',
+        estimatedDelivery: getEstimatedDelivery(deliveryZone),
         createdAt: new Date().toISOString(),
       };
 
-      try {
-        localStorage.setItem('amros_last_order', JSON.stringify(completedOrder));
-        const existingHistory = localStorage.getItem('amros_orders_history');
-        const history: Order[] = existingHistory ? JSON.parse(existingHistory) : [];
-        localStorage.setItem(
-          'amros_orders_history',
-          JSON.stringify([completedOrder, ...history])
-        );
-      } catch (err) {
-        console.error('Failed to save order to localStorage', err);
-      }
+      saveOrder(completedOrder);
 
-      if (couponCode) markCouponUsed(couponCode);
+      if (usedCoupon) markCouponUsed(usedCoupon);
       completeCheckout();
       setIsSubmitting(false);
       router.push(`/order-confirmed?orderNumber=${generatedOrderNumber}`);
@@ -144,15 +145,13 @@ export default function CheckoutPage() {
 
   if (selectedItems.length === 0) {
     return (
-      <div className="container-lux py-20 text-center max-w-md mx-auto">
-        <h2 className="font-serif text-2xl font-medium mb-2">No products selected</h2>
-        <p className="text-xs text-noir-400 mb-6">
-          Select at least one product from your scent bag to continue checkout.
-        </p>
-        <button type="button" onClick={openCart} className="btn-gold text-xs px-6 py-3">
-          Review Your Scent Bag
-        </button>
-      </div>
+      <EmptyState
+        className="container-lux py-20"
+        icon={ShoppingBag}
+        title="No products selected"
+        description="Select at least one product from your scent bag to continue checkout."
+        actions={<Button onClick={openCart}>Review Your Scent Bag</Button>}
+      />
     );
   }
 

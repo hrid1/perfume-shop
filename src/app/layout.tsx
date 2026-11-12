@@ -120,19 +120,16 @@ export default function RootLayout({
                   image: `${config.siteUrl}/icon.png`,
                   description:
                     'Amros Perfumes is a premium fragrance house in Bangladesh offering long-lasting luxury perfumes, pure attar oils, and inspired scents.',
-                  telephone: '+880 1700-000000',
-                  email: 'concierge@amrosperfumes.com',
+                  telephone: config.contact.phone,
+                  email: config.contact.email,
                   address: {
                     '@type': 'PostalAddress',
-                    streetAddress: 'Gulshan 2',
-                    addressLocality: 'Dhaka',
-                    postalCode: '1212',
-                    addressCountry: 'BD',
+                    streetAddress: config.contact.streetAddress,
+                    addressLocality: config.contact.locality,
+                    postalCode: config.contact.postalCode,
+                    addressCountry: config.contact.countryCode,
                   },
-                  sameAs: [
-                    'https://www.facebook.com/amrosperfumes',
-                    'https://www.instagram.com/amrosbd',
-                  ],
+                  sameAs: [config.social.facebook, config.social.instagram],
                   priceRange: '৳৳',
                 },
                 {

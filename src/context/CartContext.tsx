@@ -1,10 +1,19 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { CartItem, Product, ProductVariant } from '@/types';
-import { config } from '@/config/app';
+import { config, formatPrice } from '@/config/app';
+import { usePersistentState } from '@/hooks/usePersistentState';
+import { isArray } from '@/lib/storage';
+import {
+  calcCouponDiscount,
+  calcOrderTotals,
+  getCouponProblem,
+  getEffectivePrice,
+} from '@/lib/pricing';
 import { useToast } from './ToastContext';
 import { useCoupons } from './CouponContext';
+import { useProducts } from './ProductContext';
 
 interface CartContextType {
   items: CartItem[];
@@ -16,7 +25,11 @@ interface CartContextType {
   clearCart: () => void;
   completeCheckout: () => void;
   couponCode: string | null;
+  /** Why the applied coupon currently gives no discount (e.g. minimum not met), or null. */
+  couponError: string | null;
   discount: number;
+  /** Most units of this line that can be ordered (variant stock). */
+  getMaxQuantity: (item: CartItem) => number;
   applyCoupon: (code: string) => { success: boolean; message: string };
   removeCoupon: () => void;
   isCartOpen: boolean;
@@ -25,113 +38,83 @@ interface CartContextType {
   closeCart: () => void;
   totalItems: number;
   subtotal: number;
+  /** Totals below assume Dhaka city delivery; checkout recalculates for the chosen address. */
   total: number;
   deliveryFee: number;
   freeDeliveryThreshold: number;
   amountNeededForFreeDelivery: number;
 }
 
+interface StoredCoupon {
+  code: string;
+  discount: number;
+}
+
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-const CART_STORAGE_KEY = 'noire_perfumes_cart_v1';
-const CART_SELECTION_STORAGE_KEY = 'noire_perfumes_cart_selection_v1';
-const COUPON_STORAGE_KEY = 'noire_perfumes_coupon_v1';
+const isCartItems = isArray<CartItem>;
+const isIdList = (value: unknown): value is string[] =>
+  Array.isArray(value) && value.every((id) => typeof id === 'string');
+const isStoredCoupon = (value: unknown): value is StoredCoupon | null =>
+  value === null ||
+  (typeof value === 'object' && typeof (value as StoredCoupon).code === 'string');
+
+/** Cap used when a cart line's product can't be found (e.g. catalog still loading). */
+const FALLBACK_MAX_QUANTITY = 99;
+
+/** Stable id per product + size, so repeat adds merge into one line. */
+const cartItemId = (productId: string, variantId: string) => `${productId}-${variantId}`;
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([]);
-  const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
-  const [couponCode, setCouponCode] = useState<string | null>(null);
-  const [discount, setDiscount] = useState<number>(0);
+  const [items, setItems] = usePersistentState<CartItem[]>('cart', [], isCartItems);
+  const [selectedItemIds, setSelectedItemIds] = usePersistentState<string[]>(
+    'cartSelection',
+    [],
+    isIdList
+  );
+  const [storedCoupon, setStoredCoupon] = usePersistentState<StoredCoupon | null>(
+    'cartCoupon',
+    null,
+    isStoredCoupon
+  );
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
   const { success, error } = useToast();
-  const { coupons } = useCoupons();
+  const { coupons, isLoaded: couponsLoaded } = useCoupons();
+  const { products } = useProducts();
 
-  // Load from LocalStorage
-  useEffect(() => {
-    let loadedItems: CartItem[] = [];
-    try {
-      const savedItems = localStorage.getItem(CART_STORAGE_KEY);
-      if (savedItems) {
-        loadedItems = JSON.parse(savedItems);
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setItems(loadedItems);
-      }
-      setSelectedItemIds(loadedItems.map((item) => item.id));
-
-      const savedSelection = localStorage.getItem(CART_SELECTION_STORAGE_KEY);
-      if (savedSelection) {
-        const parsedSelection: unknown = JSON.parse(savedSelection);
-        if (!Array.isArray(parsedSelection) || parsedSelection.some((id) => typeof id !== 'string')) {
-          throw new Error('Saved cart selection is invalid');
-        }
-        setSelectedItemIds(
-          parsedSelection.filter((id: string) => loadedItems.some((item) => item.id === id))
-        );
-      }
-      const savedCoupon = localStorage.getItem(COUPON_STORAGE_KEY);
-      if (savedCoupon) {
-        const parsed = JSON.parse(savedCoupon);
-        setCouponCode(parsed.code);
-        setDiscount(parsed.discount);
-      }
-    } catch (e) {
-      console.error('Failed to parse cart storage', e);
-    } finally {
-      setIsLoaded(true);
-    }
-  }, []);
-
-  // Save to LocalStorage
-  useEffect(() => {
-    if (!isLoaded) return;
-    try {
-      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
-    } catch (e) {
-      console.error('Failed to save cart to storage', e);
-    }
-  }, [items, isLoaded]);
-
-  useEffect(() => {
-    if (!isLoaded) return;
-    try {
-      localStorage.setItem(CART_SELECTION_STORAGE_KEY, JSON.stringify(selectedItemIds));
-    } catch (e) {
-      console.error('Failed to save cart selection', e);
-    }
-  }, [selectedItemIds, isLoaded]);
-
-  useEffect(() => {
-    if (!isLoaded) return;
-    try {
-      if (couponCode) {
-        localStorage.setItem(COUPON_STORAGE_KEY, JSON.stringify({ code: couponCode, discount }));
-      } else {
-        localStorage.removeItem(COUPON_STORAGE_KEY);
-      }
-    } catch (e) {
-      console.error('Failed to save coupon to storage', e);
-    }
-  }, [couponCode, discount, isLoaded]);
+  const getMaxQuantity = (item: CartItem) => {
+    const variant = products
+      .find((product) => product.id === item.productId)
+      ?.sizes.find((v) => v.id === item.variantId);
+    return variant ? variant.stock : FALLBACK_MAX_QUANTITY;
+  };
 
   const addItem = (product: Product, variant: ProductVariant, quantity = 1) => {
-    const existingIndex = items.findIndex(
-      (item) => item.productId === product.id && item.variantId === variant.id
-    );
+    const matches = (item: CartItem) =>
+      item.productId === product.id && item.variantId === variant.id;
+    const existing = items.find(matches);
+    // Older carts used timestamped ids, so reuse an existing line's id when there is one.
+    const itemId = existing?.id ?? cartItemId(product.id, variant.id);
 
-    const price = variant.discountPrice || variant.price;
-
-    if (existingIndex > -1) {
-      const updated = [...items];
-      updated[existingIndex].quantity += quantity;
-      setItems(updated);
-      const existingItemId = updated[existingIndex].id;
-      setSelectedItemIds((prev) =>
-        prev.includes(existingItemId) ? prev : [...prev, existingItemId]
+    const inBag = existing?.quantity ?? 0;
+    const addable = Math.min(quantity, variant.stock - inBag);
+    if (addable <= 0) {
+      error(
+        variant.stock <= 0
+          ? `${product.name} (${variant.size}) is out of stock`
+          : `Only ${variant.stock} of ${product.name} (${variant.size}) available, and all are in your bag`
       );
-    } else {
+      return;
+    }
+
+    setItems((prev) => {
+      if (prev.some(matches)) {
+        return prev.map((item) =>
+          matches(item) ? { ...item, quantity: item.quantity + addable } : item
+        );
+      }
       const newItem: CartItem = {
-        id: `${product.id}-${variant.id}-${Date.now()}`,
+        id: itemId,
         productId: product.id,
         slug: product.slug,
         name: product.name,
@@ -139,14 +122,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
         image: product.images[0],
         size: variant.size,
         variantId: variant.id,
-        price,
-        quantity,
+        price: getEffectivePrice(variant),
+        quantity: addable,
       };
-      setItems((prev) => [...prev, newItem]);
-      setSelectedItemIds((prev) => [...prev, newItem.id]);
-    }
+      return [...prev, newItem];
+    });
+    setSelectedItemIds((prev) => (prev.includes(itemId) ? prev : [...prev, itemId]));
 
-    success(`Added ${product.name} (${variant.size}) to your bag`);
+    if (addable < quantity) {
+      error(`Only ${variant.stock} available, so ${addable} added to your bag`);
+    } else {
+      success(`Added ${product.name} (${variant.size}) to your bag`);
+    }
     setIsCartOpen(true);
   };
 
@@ -164,6 +151,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
       removeItem(itemId);
       return;
     }
+    const line = items.find((item) => item.id === itemId);
+    const max = line ? getMaxQuantity(line) : FALLBACK_MAX_QUANTITY;
+    if (quantity > max) {
+      error(`Only ${max} available for this size`);
+      quantity = max;
+    }
     setItems((prev) =>
       prev.map((item) => (item.id === itemId ? { ...item, quantity } : item))
     );
@@ -172,16 +165,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const clearCart = () => {
     setItems([]);
     setSelectedItemIds([]);
-    setCouponCode(null);
-    setDiscount(0);
+    setStoredCoupon(null);
   };
 
   const completeCheckout = () => {
     const remainingItems = items.filter((item) => !selectedItemIds.includes(item.id));
     setItems(remainingItems);
     setSelectedItemIds(remainingItems.map((item) => item.id));
-    setCouponCode(null);
-    setDiscount(0);
+    setStoredCoupon(null);
   };
 
   const toggleItemSelection = (itemId: string, selected: boolean) => {
@@ -195,75 +186,55 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const selectedItems = items.filter((item) => selectedItemIds.includes(item.id));
   const subtotal = selectedItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const selectedTotalItems = selectedItems.reduce((acc, item) => acc + item.quantity, 0);
+  const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
+
+  const couponCode = storedCoupon?.code ?? null;
   const appliedCoupon = coupons.find((coupon) => coupon.code === couponCode);
-  const effectiveDiscount = appliedCoupon
-    ? subtotal < appliedCoupon.minOrder
-      ? 0
-      : appliedCoupon.type === 'percentage'
-        ? Math.round((subtotal * appliedCoupon.value) / 100)
-        : appliedCoupon.value
-    : discount;
+  // Re-check the applied coupon on every change (selection, quantity, expiry) so a discount
+  // never applies when it shouldn't, and the customer is told why.
+  const couponError =
+    couponCode && couponsLoaded ? getCouponProblem(appliedCoupon, subtotal) : null;
+  let discount = 0;
+  if (couponCode && !couponsLoaded) {
+    // Brief window on page load before coupons arrive: show the last known discount.
+    discount = Math.min(storedCoupon?.discount ?? 0, subtotal);
+  } else if (appliedCoupon && !couponError) {
+    discount = calcCouponDiscount(appliedCoupon, subtotal);
+  }
 
   const applyCoupon = (code: string) => {
-    const cleanCode = code.trim().toUpperCase();
-    const found = coupons.find((c) => c.code === cleanCode && c.active);
-
-    if (selectedItems.length === 0) {
-      const message = 'Select at least one product before applying a promo code';
+    const fail = (message: string) => {
       error(message);
       return { success: false, message };
-    }
+    };
 
-    if (!found) {
-      error('Invalid promo code');
-      return { success: false, message: 'Invalid promo code' };
-    }
+    const cleanCode = code.trim().toUpperCase();
+    const found = coupons.find((c) => c.code === cleanCode);
 
-    if (found.expiryDate && new Date(`${found.expiryDate}T23:59:59`) < new Date()) {
-      error('This promo code has expired');
-      return { success: false, message: 'This promo code has expired' };
+    if (selectedItems.length === 0) {
+      return fail('Select at least one product before applying a promo code');
     }
+    if (!found) return fail('Invalid promo code');
+    const problem = getCouponProblem(found, subtotal);
+    if (problem) return fail(problem);
 
-    if (found.usedCount >= found.usageLimit) {
-      error('This promo code has reached its usage limit');
-      return { success: false, message: 'This promo code has reached its usage limit' };
-    }
-
-    if (subtotal < found.minOrder) {
-      const msg = `Minimum order of ৳${found.minOrder.toLocaleString()} required for ${found.code}`;
-      error(msg);
-      return { success: false, message: msg };
-    }
-
-    let calculatedDiscount = 0;
-    if (found.type === 'percentage') {
-      calculatedDiscount = Math.round((subtotal * found.value) / 100);
-    } else {
-      calculatedDiscount = found.value;
-    }
-
-    setCouponCode(found.code);
-    setDiscount(calculatedDiscount);
-    success(`Applied ${found.code} (৳${calculatedDiscount.toLocaleString()} OFF)`);
+    const calculatedDiscount = calcCouponDiscount(found, subtotal);
+    setStoredCoupon({ code: found.code, discount: calculatedDiscount });
+    success(`Applied ${found.code} (${formatPrice(calculatedDiscount)} OFF)`);
     return { success: true, message: 'Coupon applied successfully' };
   };
 
   const removeCoupon = () => {
-    setCouponCode(null);
-    setDiscount(0);
+    setStoredCoupon(null);
     success('Coupon removed');
   };
 
-  const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
-  const selectedTotalItems = selectedItems.reduce((acc, item) => acc + item.quantity, 0);
-
-  // Free delivery logic: if (subtotal - discount) >= 3000 -> 0, otherwise default inside Dhaka ৳60
-  const freeDeliveryThreshold = config.delivery.freeDeliveryThreshold;
-  const netSubtotal = Math.max(0, subtotal - effectiveDiscount);
-  const isFreeDelivery = netSubtotal >= freeDeliveryThreshold && netSubtotal > 0;
-  const deliveryFee = selectedTotalItems === 0 ? 0 : isFreeDelivery ? 0 : config.delivery.insideDhaka;
-  const total = Math.max(0, netSubtotal + deliveryFee);
-  const amountNeededForFreeDelivery = Math.max(0, freeDeliveryThreshold - netSubtotal);
+  const { deliveryFee, total, amountNeededForFreeDelivery } = calcOrderTotals({
+    subtotal,
+    discount,
+    itemCount: selectedTotalItems,
+  });
 
   return (
     <CartContext.Provider
@@ -277,7 +248,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
         clearCart,
         completeCheckout,
         couponCode,
-        discount: effectiveDiscount,
+        couponError,
+        discount,
+        getMaxQuantity,
         applyCoupon,
         removeCoupon,
         isCartOpen,
@@ -288,7 +261,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         subtotal,
         total,
         deliveryFee,
-        freeDeliveryThreshold,
+        freeDeliveryThreshold: config.delivery.freeDeliveryThreshold,
         amountNeededForFreeDelivery,
       }}
     >
